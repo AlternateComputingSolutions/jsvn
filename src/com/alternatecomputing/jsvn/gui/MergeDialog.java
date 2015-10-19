@@ -227,25 +227,21 @@ public class MergeDialog extends CommandDialog {
      */
     protected boolean isValidOptions() {
 		if (jRadioButton1.isSelected()) {
-			String revision1 = jTextField1.getText().trim();
-			if (revision1.length() == 0) {
+			if (jTextField1.getText().trim().length() == 0) {
 				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for Revision 1");
 				return false;
 			}
-			String revision2 = jTextField3.getText().trim();
-			if (revision2.length() == 0) {
+			if (jTextField3.getText().trim().length() == 0) {
 				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for Revision 2");
 				return false;
 			}
 		}
 		if (jRadioButton2.isSelected()) {
-			String url1 = jTextField2.getText().trim();
-			if (url1.length() == 0) {
+			if (jTextField2.getText().trim().length() == 0) {
 				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for URL 1");
 				return false;
 			}
-			String url2 = jTextField4.getText().trim();
-			if (url2.length() == 0) {
+			if (jTextField4.getText().trim().length() == 0) {
 				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for URL 2");
 				return false;
 			}

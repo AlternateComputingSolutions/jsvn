@@ -24,27 +24,25 @@ import java.text.MessageFormat;
  *   --non-interactive        : do no interactive prompting
  */
 public class Switch extends Command {
-	private static final String COMMAND = "svn switch {0} {1} {2} {3}";   // revision, non-recursive, url, path
+	private static final String COMMAND = "svn switch {0} {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, non-recursive, url, path
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String REVISION = "REVISION";
 	public static final String URL = "URL";
 	public static final String PATH = "PATH";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = true;
-
 		String url = (String) args.get(URL);
-		if (url == null) {
+		if (url == null || "".equals(url.trim())) {
 			throw new CommandException("Missing URL");
 		}
 
 		String path = (String) args.get(PATH);
-		if (path == null) {
+		if (path == null || "".equals(path.trim())) {
 			throw new CommandException("Missing path");
 		}
 
 		String revision = (String) args.get(REVISION);
-		if (revision != null) {
+		if (revision != null && !"".equals(revision.trim())) {
 			revision = "-r " + revision;
 		} else {
 			revision = "";

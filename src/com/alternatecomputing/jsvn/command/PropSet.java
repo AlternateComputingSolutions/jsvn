@@ -1,5 +1,6 @@
 package com.alternatecomputing.jsvn.command;
 
+import java.text.MessageFormat;
 import java.util.Map;
 
 /**
@@ -32,6 +33,55 @@ import java.util.Map;
  */
 public class PropSet extends Command {
 
+	private static final String COMMAND = "svn propset {0} {1} {2} {3} {4}";
+
+	public static final String NONRECURSIVE = "NONRECURSIVE";
+	public static final String PROPERTY_NAME = "PROPERTY_NAME";
+	public static final String PROPERTY_VALUE = "PROPERTY_VALUE";
+	public static final String PROPVALUE_IS_FILE = "PROPVALUE_IS_FILE";
+	public static final String TARGETS = "TARGETS";
+	public static final String QUIET = "QUIET";
+
 	public void init(Map args) throws CommandException {
+
+		Boolean nonRecursive = (Boolean) args.get(NONRECURSIVE);
+		String nonRecursiveOption;
+		if (Boolean.TRUE == nonRecursive) {
+			nonRecursiveOption = "-N";
+		} else {
+			nonRecursiveOption = "";
+		}
+
+		Boolean quiet = (Boolean) args.get(QUIET);
+		String quietOption;
+		if (Boolean.TRUE == quiet) {
+			quietOption = "-q";
+		} else {
+			quietOption = "";
+		}
+
+		String targets = (String) args.get(TARGETS);
+		if (targets == null || "".equals(targets.trim())) {
+			throw new CommandException("Missing target(s)");
+		}
+
+		String propertyNameOption = (String) args.get(PROPERTY_NAME);
+		if (propertyNameOption == null || "".equals(propertyNameOption.trim())) {
+			throw new CommandException("Missing property name");
+		}
+
+		String propertyValueOption = (String) args.get(PROPERTY_VALUE);
+		if (propertyValueOption == null || "".equals(propertyValueOption.trim())) {
+			throw new CommandException("Missing property value");
+		}
+		propertyValueOption = "\""+ propertyValueOption + "\"";
+
+		Boolean propValIsFile = (Boolean) args.get(PROPVALUE_IS_FILE);
+		if (Boolean.TRUE == propValIsFile) {
+			 propertyValueOption = "-F " + propertyValueOption;
+		}
+
+		setCommand(MessageFormat.format(COMMAND,
+			new String[]{quietOption, nonRecursiveOption, propertyNameOption, propertyValueOption, targets}));
 	}
 }

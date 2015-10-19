@@ -68,13 +68,15 @@ public class JSVNTree extends JTree implements ActionListener {
 	private static final String ACTION_SWITCH = "Switch";
 	private static final String ACTION_UPDATE = "Update";
 	private static final String NEWLINE_CHARACTER = "\n";
+    private Executable executor;
 	private JPopupMenu mainPopup;
 	private JMenuItem miAdd, miCat, miCheckout, miCleanup, miCommit, miDelete, miDiff, miImport, miCopy, miResolve, miMerge,
 	miMkDir, miMove, miRevert, miSwitch, miUpdate, miInfo, miLog, miStatus, miPropList, miPropGet, miPropSet,
 	miPropEdit, miPropDel, miRefreshOnline, miRefreshOffline;
 
-	public JSVNTree(SVNTreeModel root) {
+	public JSVNTree(SVNTreeModel root, Executable executor ) {
 		this.setModel(new DefaultTreeModel(buildTreeNode(root).getRoot()));
+        this.executor = executor;
 		// define the mainPopup
 		mainPopup = new JPopupMenu();
 		miAdd = new JMenuItem(ACTION_ADD);
@@ -300,7 +302,7 @@ public class JSVNTree extends JTree implements ActionListener {
 		if (targets == null) {
 			// user hasn't selected anything -- pop-up a error message
 		} else {
-			Executable executor = (Executable) this.getTopLevelAncestor();
+			// Executable executor = (Executable) this.getTopLevelAncestor();
 			if (ae.getActionCommand().equals(ACTION_ADD)) {
 				// process add request
 				Command command = new Add();

@@ -68,8 +68,8 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 279;
-        gridBagConstraints.insets = new java.awt.Insets(20, 13, 0, 67);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(20, 13, 0, 67);
         jPanel1.add(jTextField1, gridBagConstraints);
 
         jLabel1.setText("Source:");
@@ -97,8 +97,8 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 279;
-        gridBagConstraints.insets = new java.awt.Insets(31, 13, 1, 67);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(31, 13, 1, 67);
         jPanel1.add(jTextField2, gridBagConstraints);
 
         jButton1.setText("...");
@@ -123,8 +123,8 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 279;
-        gridBagConstraints.insets = new java.awt.Insets(30, 13, 4, 67);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(30, 13, 4, 67);
         jPanel1.add(jTextField3, gridBagConstraints);
 
         jButton2.setText("...");
@@ -148,8 +148,8 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
-        gridBagConstraints.insets = new java.awt.Insets(27, 13, 30, 0);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(27, 13, 30, 0);
         jPanel1.add(jTextField4, gridBagConstraints);
 
         jRadioButton1.setSelected(true);
@@ -194,8 +194,8 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridy = 3;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 13;
-        gridBagConstraints.insets = new java.awt.Insets(47, 13, 14, 0);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(47, 13, 14, 0);
         jPanel1.add(jLabel3, gridBagConstraints);
 
         jLabel4.setText("specify revision number ARG (or X:Y range)");
@@ -205,8 +205,8 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 13;
-        gridBagConstraints.insets = new java.awt.Insets(50, 13, 64, 0);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(50, 13, 64, 0);
         jPanel1.add(jLabel4, gridBagConstraints);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.WEST);
@@ -276,19 +276,12 @@ public class MoveDialog extends CommandDialog {
 		args.put(Move.SOURCE, jTextField1.getText().trim());
 		args.put(Move.DESTINATION, jTextField2.getText().trim());
 		String revision = jTextField3.getText().trim();
-		String date = jTextField4.getText().trim();
-		if (!"".equals(revision)) {
+		if (jRadioButton1.isSelected() && revision.length() > 0) {
 			args.put(Move.REVISION, revision);
 		}
-		if (jRadioButton1.isSelected()) {
-			if (revision.length() > 0) {
-				args.put(Move.REVISION, jTextField1.getText());
-			}
-		}
-		if (jRadioButton2.isSelected()) {
-			if (date.length() > 0) {
-				args.put(Move.REVISION, "{" + date + "}");
-			}
+		String date = jTextField4.getText().trim();
+		if (jRadioButton2.isSelected() && date.length() > 0) {
+			args.put(Move.REVISION, "{" + date + "}");
 		}
 		return new Move();
     }

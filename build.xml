@@ -1,16 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 Build file for JSVN application
---><project basedir="." default="build" name="jsvn">
+--><project basedir="." default="dist" name="jsvn">
+
+<!-- TODO: define a task that generates a .jar with only ant related classes -->
+
+
 
    <!-- define some variables -->
    <target name="init">
       <tstamp/>
 
       <property name="name" value="jsvn"/>
-      <property name="build.version" value="0.4"/>
+      <property name="build.version" value="0.5"/>
       <property name="classes.dir" value="classes/"/>
       <property name="doc.dir" value="docs/"/>
+      <property name="etc.dir" value="etc/"/>
       <property name="javadoc.dir" value="${doc.dir}/javadoc/"/>
       <property name="src.dir" value="src/"/>
       <property name="lib.dir" value="lib/"/>
@@ -21,6 +26,16 @@ Build file for JSVN application
       <property name="finalsrctarfile.name" value="${name}-src-${build.version}.tgz"/>
       <property name="main.class" value="com.alternatecomputing.jsvn.gui.Application"/>
       <property name="test.class.name" value="com.alternatecomputing.jsvn.Suite" />
+
+	   <path id="libs">
+		   <path location="${lib.dir}/junit.jar"/>
+		   <path location="${idea.dir}/lib/openapi.jar"/>
+	   </path>
+
+       <condition property="ideaAvail">
+		   <available classpathref="libs" classname="com.intellij.openapi.project.Project"/>
+       </condition>
+
    </target>
 
    <!-- delete working directories -->
@@ -33,16 +48,17 @@ Build file for JSVN application
    <!-- create working directory trees -->
    <target depends="init" name="prepare">
       <mkdir dir="${classes.dir}"/>
+      <mkdir dir="${classes.dir}/META-INF"/>
       <mkdir dir="${dist.dir}"/>
       <mkdir dir="${javadoc.dir}"/>
    </target>
 
     <!-- Compile the JUnit tests -->
-    <target name="generate-tests" depends="generate-jar">
+	<target name="generate-tests" depends="dist">
 	<mkdir dir="${classes.dir}/testcases"/>
-        <javac srcdir="test/src/" destdir="${classes.dir}/testcases">
+		<javac srcdir="test/src/" destdir="${classes.dir}/testcases">
             <classpath>
-	        <pathelement location="${lib.dir}/junit.jar"/>
+	        	<path refid="libs" />
                 <pathelement location="${dist.dir}/${finaljarfile.name}" />
             </classpath>
             <include name="**/*.java"/>
@@ -55,56 +71,71 @@ Build file for JSVN application
             taskname="junit" failonerror="true">
             <arg value="${test.class.name}"/>
             <classpath>
-		<pathelement location="${lib.dir}/junit.jar"/>
-                <pathelement location="${dist.dir}/${finaljarfile.name}" />
-                <pathelement location="${classes.dir}/testcases" />
-                <pathelement path="${java.class.path}" />
+	        	<pathelement location="${lib.dir}/openapi.jar"/>
+				<pathelement location="${lib.dir}/junit.jar"/>
+				<pathelement location="${dist.dir}/${finaljarfile.name}" />
+				<pathelement location="${classes.dir}/testcases" />
+				<pathelement path="${java.class.path}" />
             </classpath>
         </java>
     </target>
 
     <!-- Run the application, compile if necessary -->
-    <target name="run" depends="generate-jar">
-	<java fork="yes" jar="${dist.dir}${finaljarfile.name}"/>
+    <target name="run" depends="dist">
+		<java fork="yes" jar="${dist.dir}${finaljarfile.name}"/>
     </target>
 
-   <!-- compile classes -->
-   <target depends="prepare" name="generate-classes">
-      <javac debug="on" destdir="${classes.dir}" extdirs="${lib.dir}" srcdir="${src.dir}"/>
-   </target>
+    <!-- compile classes -->
+	<target depends="prepare, generate-main-classes, generate-idea-classes" name="generate-all-classes"/>
 
-   <!-- create the jsvn.jar file consisting of the classes and META-INF -->
-   <target depends="generate-classes" name="generate-jar">
+    <target depends="prepare" name="generate-idea-classes" if="ideaAvail">
+		<javac debug="on" destdir="${classes.dir}" srcdir="${src.dir}" classpathref="libs">
+			<include name="com/alternatecomputing/jsvn/idea/**"/>
+        </javac>
+    </target>
 
-   <jar basedir="${classes.dir}" jarfile="${dist.dir}/${finaljarfile.name}">
-        <manifest>
-            <attribute name="Main-Class" value="${main.class}"/>
-        </manifest>
-      </jar>
-   </target>
+	<target depends="prepare" name="generate-main-classes">
+        <javac debug="on" destdir="${classes.dir}" srcdir="${src.dir}" classpathref="libs" >
+			<exclude name="com/alternatecomputing/jsvn/idea/**"/>
+        </javac>
+    </target>
 
-   <!-- create the jsvn.jar file consisting of the classes and META-INF -->
-   <target depends="prepare" name="generate-src-tar">
+    <!-- create the jsvn.jar file consisting of the classes and META-INF -->
+    <target depends="generate-all-classes" name="dist">
 
-    <tar tarfile="${dist.dir}/${finalsrctarfile.name}" compression="gzip">
-        <tarfileset dir="${basedir}" includes="src/** lib/** README.txt LICENSE.txt build.xml" excludes="**/.nbattrs **/*.tgz *.sh "/>
-    </tar>
+        <!--this task copies the ant task definition file to the root of the jar file, for ease of use within ant -->
+        <copy file="${etc.dir}/taskdef.properties" todir="${classes.dir}" />
+        <copy file="${etc.dir}/plugin.xml" todir="${classes.dir}/META-INF"/>
 
-   </target>
+        <jar basedir="${classes.dir}" jarfile="${dist.dir}/${finaljarfile.name}">
+            <manifest>
+                <attribute name="Main-Class" value="${main.class}"/>
+            </manifest>
+        </jar>
+    </target>
 
-   <!-- create JavaDoc for all jsvn classes -->
-   <target depends="generate-classes" name="generate-javadoc">
-     <delete dir="${javadoc.dir}"/>
-     <mkdir dir="${javadoc.dir}"/>
-     <javadoc author="true" bottom="&lt;i&gt;Copyright &amp;#169; 2002-2003 All Rights Reserved.&lt;/i&gt;" destdir="${javadoc.dir}" doctitle="&lt;h1&gt;${name} ${build.version}&lt;/h1&gt;" packagenames="com.*" private="true" sourcepath="${src.dir}" use="true" version="true" windowtitle="${name} API ${build.version}"/>
-   </target>
+    <!-- create the jsvn.jar file consisting of the classes and META-INF -->
+    <target depends="prepare" name="generate-src-tar">
+
+        <tar tarfile="${dist.dir}/${finalsrctarfile.name}" compression="gzip">
+            <tarfileset dir="${basedir}" includes="etc/** src/** lib/** README.txt LICENSE.txt build.xml" excludes="**/.nbattrs **/*.tgz *.sh "/>
+        </tar>
+
+    </target>
+
+	<!-- create JavaDoc for all jsvn classes -->
+	<target depends="generate-all-classes" name="generate-javadoc">
+		<delete dir="${javadoc.dir}"/>
+		<mkdir dir="${javadoc.dir}"/>
+		<javadoc author="true" bottom="&lt;i&gt;Copyright &amp;#169; 2002-2003 All Rights Reserved.&lt;/i&gt;" destdir="${javadoc.dir}" doctitle="&lt;h1&gt;${name} ${build.version}&lt;/h1&gt;" packagenames="com.*" private="true" sourcepath="${src.dir}" use="true" version="true" windowtitle="${name} API ${build.version}"/>
+	</target>
 
 	<!-- build everything -->
-   <target depends="generate-src-tar,generate-docs-tar,generate-jar" name="build"/>
+	<target depends="generate-src-tar,generate-docs-tar,dist" name="all"/>
 
-   <!-- build the javadocs jar file -->
-   <target depends="generate-javadoc" name="generate-docs-tar">
-       <tar basedir="${javadoc.dir}" compression="gzip" tarfile="${dist.dir}/${finaldocstarfile.name}"/>
-   </target>
+	<!-- build the javadocs jar file -->
+	<target depends="generate-javadoc" name="generate-docs-tar">
+		<tar basedir="${javadoc.dir}" compression="gzip" tarfile="${dist.dir}/${finaldocstarfile.name}"/>
+	</target>
 
 </project>

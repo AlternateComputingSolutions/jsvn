@@ -38,28 +38,27 @@ import java.util.Map;
 
  */
 public class Diff extends Command {
-	private static final String COMMAND = "svn diff {0} {1} {2} {3}";   // revision, extensions, non-recursive, targets
+	private static final String COMMAND = "svn diff {0} {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, extensions, non-recursive, targets
 	public static final String EXTENSIONS = "EXTENSIONS";
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String REVISION = "REVISION";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = true;
 		String targets = (String) args.get(TARGETS);
-		if (targets == null) {
-			throw new CommandException("Missing targets");
+		if (targets == null || "".equals(targets.trim())) {
+			throw new CommandException("Missing target(s)");
 		}
 
 		String revision = (String) args.get(REVISION);
-		if (revision != null) {
+		if (revision != null && !"".equals(revision.trim())) {
 			revision = "-r " + revision;
 		} else {
-			throw new CommandException("Must specify a revision");
+			revision = "";
 		}
 
 		String extensions = (String) args.get(EXTENSIONS);
-		if (extensions != null) {
+		if (extensions != null && !"".equals(extensions.trim())) {
 			extensions = "-x " + extensions;
 		} else {
 			extensions = "";

@@ -40,9 +40,10 @@ public class SVNTreeModel {
 				String result = status.getResult();
 				_root =  Parser.parse(result);
 			} catch (CommandException e) {
-				e.printStackTrace();
+				// this may occur if the working copy is a non-versioned directory
 				_root =  null;
 			} catch (IOException e) {
+				// this may be thrown by the parser if there are problems looking at physical files in the working copy
 				e.printStackTrace();
 				_root =  null;
 			}

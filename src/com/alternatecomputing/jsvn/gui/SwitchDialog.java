@@ -190,14 +190,13 @@ public class SwitchDialog extends CommandDialog {
     protected Command buildCommand(Map args) {
 		args.put(Switch.URL, jTextField1.getText().trim());
 		String revision = jTextField2.getText().trim();
-		String date = jTextField3.getText().trim();
 		if (jRadioButton1.isSelected() && revision.length() > 0) {
-			args.put(Update.REVISION, jTextField1.getText());
+			args.put(Update.REVISION, revision);
 		}
+		String date = jTextField3.getText().trim();
 		if (jRadioButton2.isSelected() && date.length() > 0) {
 			args.put(Update.REVISION, "{" + date + "}");
 		}
-
 		if (jCheckBox1.isSelected()) {
 			args.put(Switch.NONRECURSIVE, Boolean.TRUE);
 		}

@@ -1,10 +1,8 @@
 package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.command.Update;
 import com.alternatecomputing.jsvn.command.Log;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.util.Map;
@@ -90,8 +88,8 @@ public class LogDialog extends CommandDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
-        gridBagConstraints.insets = new java.awt.Insets(39, 10, 0, 32);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(39, 10, 0, 32);
         jPanel1.add(jTextField1, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -99,8 +97,8 @@ public class LogDialog extends CommandDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
-        gridBagConstraints.insets = new java.awt.Insets(31, 10, 4, 32);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(31, 10, 4, 32);
         jPanel1.add(jTextField2, gridBagConstraints);
 
         jLabel1.setText("specify revision number ARG (or X:Y range)");
@@ -109,8 +107,8 @@ public class LogDialog extends CommandDialog {
         gridBagConstraints.gridy = 1;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 13;
-        gridBagConstraints.insets = new java.awt.Insets(1, 10, 38, 32);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(1, 10, 38, 32);
         jPanel1.add(jLabel1, gridBagConstraints);
 
         jLabel2.setText("specify a date ARG (instead of a revision)");
@@ -120,8 +118,8 @@ public class LogDialog extends CommandDialog {
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 24;
-        gridBagConstraints.insets = new java.awt.Insets(51, 10, 30, 32);
         gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(51, 10, 30, 32);
         jPanel1.add(jLabel2, gridBagConstraints);
 
         jCheckBox1.setText("Verbose");
@@ -160,15 +158,13 @@ public class LogDialog extends CommandDialog {
      * @return implementation of Command to execute with the given configured args
      */
     protected Command buildCommand(Map args) {
-		if (jRadioButton1.isSelected()) {
-			if (jTextField1.getText().length() == 0) {
-				args.put(Log.REVISION, "COMMITTED");
-			} else {
-				args.put(Log.REVISION, jTextField1.getText());
-			}
+		String revision = jTextField1.getText().trim();
+		if (jRadioButton1.isSelected() && revision.length() > 0) {
+			args.put(Log.REVISION, revision);
 		}
-		if (jRadioButton2.isSelected()) {
-			args.put(Log.REVISION, "{" + jTextField2.getText() + "}");
+		String date = jTextField2.getText().trim();
+		if (jRadioButton2.isSelected() && date.length() > 0) {
+			args.put(Log.REVISION, "{" + date + "}");
 		}
 		if (jCheckBox1.isSelected()) {
 			args.put(Log.VERBOSE, Boolean.TRUE);
@@ -210,20 +206,7 @@ public class LogDialog extends CommandDialog {
      * @return options validity indicator
      */
     protected boolean isValidOptions() {
-		if (jRadioButton1.isSelected()) {
-			String revision = jTextField1.getText().trim();
-			if (revision.length() == 0) {
-				jTextField1.setText(revision);
-			}
-		}
-		if (jRadioButton2.isSelected()) {
-			String date = jTextField2.getText().trim();
-			// XXX validate date is in YYYY-MM-DD format using regex
-			if (date.length() == 0) {
-				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a date");
-				return false;
-			}
-		}
+		// XXX validate date is in YYYY-MM-DD format using regex
 		return true;
     }
 

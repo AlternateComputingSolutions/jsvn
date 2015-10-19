@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 public class InputStreamSink implements Runnable {
-	private static final int BLOCK_SIZE = 1024;
+	private static final int BLOCK_SIZE = 4 * 1024;
 	private StringBuffer _sink;
 	private InputStream _in;
 	private CommandRunner _callback;

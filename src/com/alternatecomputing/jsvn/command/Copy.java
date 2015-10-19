@@ -30,26 +30,24 @@ import java.text.MessageFormat;
  *   --encoding arg           : treat value as being in charset encoding ARG
  */
 public class Copy extends Command {
-	private static final String COMMAND = "svn copy {0} {1} {2}";	// revision, source, destination
+	private static final String COMMAND = "svn copy {0} {1} {2} " + Command.NON_INTERACTIVE_MODIFIER;	// revision, source, destination
 	public static final String SOURCE = "SOURCE";
 	public static final String DESTINATION = "DESTINATION";
 	public static final String REVISION = "REVISION";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = true;
-
 		String source = (String) args.get(SOURCE);
-		if (source == null) {
+		if (source == null || "".equals(source.trim())) {
 			throw new CommandException("Missing source");
 		}
 
 		String destination = (String) args.get(DESTINATION);
-		if (destination == null) {
+		if (destination == null || "".equals(destination.trim())) {
 			throw new CommandException("Missing destination");
 		}
 
 		String revision = (String) args.get(REVISION);
-		if ((revision != null) && (!"".equals(revision))) {
+		if ((revision != null) && (!"".equals(revision.trim()))) {
 			revision = "-r " + revision;
 		} else {
 			revision = "";

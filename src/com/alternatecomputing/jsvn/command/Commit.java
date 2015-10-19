@@ -27,16 +27,14 @@ import java.util.Map;
  *   --encoding arg           : treat value as being in charset encoding ARG
  */
 public class Commit extends Command {
-	private static final String COMMAND = "svn commit --file {0} {1}";
+	private static final String COMMAND = "svn commit --file {0} {1} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String COMMIT_MESSAGE = "COMMIT_MESSAGE";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = true;
-
 		String targets = (String) args.get(TARGETS);
-		if (targets == null) {
-			throw new CommandException("Missing targets");
+		if (targets == null || "".equals(targets.trim())) {
+			throw new CommandException("Missing target(s)");
 		}
 
 		String commitMessage = (String) args.get(COMMIT_MESSAGE);

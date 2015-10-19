@@ -309,17 +309,15 @@ public class CheckoutDialog extends CommandDialog {
     protected Command buildCommand(Map args) {
 		args.put(Checkout.REPOS_URL, jTextField1.getText().trim());
 		args.put(Checkout.DESTINATION, jTextField2.getText().trim());
-		if (jRadioButton1.isSelected()) {
-			String revision = jTextField3.getText().trim();
-			if ("".equals(revision)) {
-				args.put(Checkout.REVISION, "HEAD");
-			} else {
-				args.put(Checkout.REVISION, revision);
-			}
+		args.put(Checkout.USERNAME, jTextField4.getText().trim());
+		args.put(Checkout.PASSWORD, new String(jPasswordField1.getPassword()));
+		String revision = jTextField3.getText().trim();
+		if (jRadioButton1.isSelected() && revision.length() > 0) {
+			args.put(Checkout.REVISION, revision);
 		}
-		if (jRadioButton2.isSelected()) {
-			String date = jTextField5.getText().trim();
-			args.put(Checkout.REVISION, date);
+		String date = jTextField5.getText().trim();
+		if (jRadioButton2.isSelected() && date.length() > 0) {
+			args.put(Checkout.REVISION, "{" + date + "}");
 		}
 		if (jCheckBox1.isSelected()) {
 			args.put(Checkout.NONRECURSIVE, Boolean.TRUE);
@@ -357,13 +355,8 @@ public class CheckoutDialog extends CommandDialog {
      * @return options validity indicator
      */
     protected boolean isValidOptions() {
-		String url =jTextField1.getText().trim();
-		if (url.length() == 0) {
+		if (jTextField1.getText().trim().length() == 0) {
 			JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a URL");
-			return false;
-		}
-		if (jRadioButton2.isSelected() && jTextField5.getText().trim().length() < 1) {
-			JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a date");
 			return false;
 		}
 		String localPath =jTextField2.getText().trim();
@@ -381,11 +374,8 @@ public class CheckoutDialog extends CommandDialog {
 		}
 		// passes validation, update the configuration so the checkout will have the correct auth credentials
 		_newConfig = new Configuration();
-		_newConfig.setUsername(jTextField4.getText().trim());
-		_newConfig.setPassword(new String(jPasswordField1.getPassword()));
 		_newConfig.setWorkingCopy(localPath);
 		ConfigurationManager.getInstance().setConfig(_newConfig);
-
 		return true;
     }
 
@@ -397,6 +387,7 @@ public class CheckoutDialog extends CommandDialog {
 		if (success) {
 			// if checkout command ran correctly, save the new config settings
 			ConfigurationManager.getInstance().saveConfig();
+			Application.getApplicationFrame().setWorkingCopy(ConfigurationManager.getInstance().getWorkingCopy());
 		} else {
 			// checkout command errored out, restore the original config settings
 			ConfigurationManager.getInstance().loadConfig();

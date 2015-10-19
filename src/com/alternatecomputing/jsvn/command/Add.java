@@ -19,8 +19,8 @@ public class Add extends Command {
 
 	public void init(Map args) throws CommandException {
 		String targets = (String) args.get(TARGETS);
-		if (targets == null) {
-			throw new CommandException("Missing targets");
+		if (targets == null || "".equals(targets.trim())) {
+			throw new CommandException("Missing target(s)");
 		}
 
 		// build the command

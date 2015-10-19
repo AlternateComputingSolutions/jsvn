@@ -37,24 +37,22 @@ import java.util.Map;
  *    --non-interactive        : do no interactive prompting
  */
 public class Update extends Command {
-	private static final String COMMAND = "svn update {0} {1} {2}";   // revision, non-recursive, targets
+	private static final String COMMAND = "svn update {0} {1} {2} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, non-recursive, targets
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String REVISION = "REVISION";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = true;
-
 		String targets = (String) args.get(TARGETS);
-		if (targets == null) {
-			throw new CommandException("Missing targets");
+		if (targets == null || "".equals(targets.trim())) {
+			throw new CommandException("Missing target(s)");
 		}
 
 		String revision = (String) args.get(REVISION);
-		if (revision != null) {
+		if (revision != null && !"".equals(revision.trim())) {
 			revision = "-r " + revision;
 		} else {
-			throw new CommandException("Must specify a revision");
+			revision = "";
 		}
 
 		Boolean nonRecursive = (Boolean) args.get(NONRECURSIVE);

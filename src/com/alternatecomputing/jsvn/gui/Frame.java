@@ -8,33 +8,40 @@ import com.alternatecomputing.jsvn.configuration.Configuration;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import com.alternatecomputing.jsvn.model.SVNTreeModel;
 
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.tree.DefaultTreeModel;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Map;
 
 
-public class Frame extends CenterableFrame implements ActionListener, Executable{
+public class Frame extends CenterableFrame implements ActionListener, Executable {
+	private static final char MNEMONIC_CHECKOUT = 'C';
+	private static final char MNEMONIC_SET_WORKING_COPY = 'S';
+	private static final char MNEMONIC_WORKING_COPY = 'W';
+	private static final char MNEMONIC_REFRESH_WORKING_COPY = 'R';
+	private static final char MNEMONIC_HELP = 'H';
+	private static final char MNEMONIC_ABOUT = 'A';
+	private static final char MNEMONIC_EXIT = 'E';
+	private static final char MNEMONIC_FILE = 'F';
+	private static final String CONFIRMATION = "Confirmation";
+	private static final String OVERWRITE_EXISTING_FILE = "Overwrite existing file?";
+	private static final String NEWLINE_CHARACTER = "\n";
+	private static final String PERIOD_CHARACTER = ".";
 	private static final String ACTION_CLOSE_TAB = "CloseTab";
+	private static final String ACTION_CLOSE_ALL_TAB = "CloseAllTab";
+	private static final String ACTION_CLOSE_ALL_BUT_THIS_TAB = "CloseAllButThisTab";
+	private static final String ACTION_SAVE_TAB = "SaveTab";
 	private static final String MENU_ITEM_FILE = "File";
 	private static final String MENU_ITEM_EXIT = "Exit";
 	private static final String MENU_ITEM_WORKING_COPY = "Working Copy";
@@ -44,17 +51,31 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 	private static final String MENU_ITEM_HELP = "Help";
 	private static final String MENU_ITEM_ABOUT = "About";
 	private static final String MENU_ITEM_CLOSE = "Close";
+	private static final String MENU_ITEM_CLOSE_ALL = "Close All";
+	private static final String MENU_ITEM_CLOSE_ALL_BUT_THIS = "Close All But This";
+	private static final String MENU_ITEM_SAVE = "Save To File";
 	private static final String STATUS_READY = "Ready";
 	private static final String STATUS_EXECUTING = "Executing...";
 	private static final String TAB_COMMAND_HISTORY = "Command History";
+    private JPanel content;
 	private JLabel _statusBar = new JLabel(STATUS_READY);
 	private JTabbedPane _outputTabbedPane = new JTabbedPane();
 	private JTextPane _historyTextPane = new JTextPane();
 	private JSVNTree _svnTree;
-	private JPopupMenu popupMenu;
+	private JPopupMenu _popupMenu;
+	private JMenuItem _miCloseTab, _miCloseAllTab, _miCloseAllButThisTab, _miSaveTab;
+    private Executable _executor;
 
-	/** constructor */
+    /** constructor with provided executor */
+    public Frame( Executable executor ) {
+        _executor = executor;
+        initGUI();
+        pack();
+    }
+
+    /** constructor */
 	public Frame() {
+        _executor = this;
 		initGUI();
 		pack();
 	}
@@ -63,7 +84,7 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 	private void initGUI() {
 		getContentPane().setLayout(new BorderLayout());
 
-		JPanel content = new JPanel();
+		content = new JPanel();
 
 		content.setPreferredSize(new Dimension(1000, 600));
 		content.setLayout(new BorderLayout());
@@ -75,16 +96,16 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 		setTitle(Constants.PRODUCT_NAME + " " + Constants.PRODUCT_VERSION);
 
 		// add status bar
-		getContentPane().add(_statusBar, BorderLayout.SOUTH);
+		content.add(_statusBar, BorderLayout.SOUTH);
 
 		// add menu bar
 		JMenuBar menuBar = new JMenuBar();
 		JMenu menuFile = new JMenu(MENU_ITEM_FILE);
-		menuFile.setMnemonic('F');
+		menuFile.setMnemonic(MNEMONIC_FILE);
 
 		// create Exit menu item
 		JMenuItem fileExit = new JMenuItem(MENU_ITEM_EXIT);
-		fileExit.setMnemonic('E');
+		fileExit.setMnemonic(MNEMONIC_EXIT);
 		fileExit.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -94,25 +115,48 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 
 		// create Working Copy menu item
 		JMenu menuWorkingCopy = new JMenu(MENU_ITEM_WORKING_COPY);
-		menuWorkingCopy.setMnemonic('W');
+		menuWorkingCopy.setMnemonic(MNEMONIC_WORKING_COPY);
 		JMenuItem workingCopySet = new JMenuItem(MENU_ITEM_WORKING_COPY_SET);
-		workingCopySet.setMnemonic('S');
+		workingCopySet.setMnemonic(MNEMONIC_SET_WORKING_COPY);
 		workingCopySet.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 
 						Configuration c = ConfigurationManager.getInstance().getConfig();
+                        JFileChooser chooser;
+						String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+						if (workingDirectory != null) {
+							File currentWorkingDirectory = new File(workingDirectory);
+							if (currentWorkingDirectory.exists()) {
+								chooser = new JFileChooser(currentWorkingDirectory);
+							} else {
+								chooser = new JFileChooser();
+							}
+						} else {
+							chooser = new JFileChooser();
+						}
 
-						PreferencesDialog d = new PreferencesDialog(new JFrame(), true, c);
-						d.setVisible(true);
+						chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+						int action = chooser.showOpenDialog(new JFrame());
+						if (action == JFileChooser.APPROVE_OPTION) {
+							try {
+								File file = new File(chooser.getSelectedFile().getCanonicalPath());
+								c.setWorkingCopy(file.toString());
+								ConfigurationManager.getInstance().setConfig(c);
+								ConfigurationManager.getInstance().saveConfig();
+							} catch (IOException e1) {
+								// XXX - log error here
+								e1.printStackTrace();
+							}
+						}
 
-						SVNTreeModel svnTreeModel = new SVNTreeModel(ConfigurationManager.getInstance().getWorkingCopy(), false);
-						_svnTree.setModel(new DefaultTreeModel(JSVNTree.buildTreeNode(svnTreeModel)));
-					}
+                        setWorkingCopy(  ConfigurationManager.getInstance().getWorkingCopy() );
+                    }
 				});
+
 		menuWorkingCopy.add(workingCopySet);
 		JMenuItem workingCopyCheckout = new JMenuItem(MENU_ITEM_WORKING_COPY_CHECKOUT);
-		workingCopyCheckout.setMnemonic('C');
+		workingCopyCheckout.setMnemonic(MNEMONIC_CHECKOUT);
 		workingCopyCheckout.setEnabled(true);
 		workingCopyCheckout.addActionListener(
 				new ActionListener() {
@@ -125,7 +169,7 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 				});
 		menuWorkingCopy.add(workingCopyCheckout);
 		JMenuItem workingCopyRefresh = new JMenuItem(MENU_ITEM_WORKING_COPY_REFRESH);
-		workingCopyRefresh.setMnemonic('R');
+		workingCopyRefresh.setMnemonic(MNEMONIC_REFRESH_WORKING_COPY);
 		workingCopyRefresh.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -136,9 +180,9 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 
 		// create About menu item
 		JMenu menuHelp = new JMenu(MENU_ITEM_HELP);
-		menuHelp.setMnemonic('H');
+		menuHelp.setMnemonic(MNEMONIC_HELP);
 		JMenuItem helpAbout = new JMenuItem(MENU_ITEM_ABOUT);
-		helpAbout.setMnemonic('A');
+		helpAbout.setMnemonic(MNEMONIC_ABOUT);
 		helpAbout.addActionListener(
 				new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -171,7 +215,7 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 
 		// install the new tree model
 		SVNTreeModel model = new SVNTreeModel(ConfigurationManager.getInstance().getWorkingCopy(), false);
-		_svnTree = new JSVNTree(model);
+		_svnTree = new JSVNTree(model, _executor);
 		JScrollPane svnPane = new JScrollPane();
 		svnPane.setViewportView(_svnTree);
 		mainSplitPane.add(svnPane, JSplitPane.LEFT);
@@ -194,19 +238,41 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 		historyTabbedPane.setSize(new Dimension(633, 174));
 		historyTabbedPane.add(historyPane, TAB_COMMAND_HISTORY);
 
-		// create the scrollable text pane for svn console output
-		popupMenu = new JPopupMenu();
-		JMenuItem mi = new JMenuItem(MENU_ITEM_CLOSE);
-		mi.addActionListener(this);
-		mi.setActionCommand(ACTION_CLOSE_TAB);
-		popupMenu.add(mi);
+		// create the popup menu & listener for the tabbed command output
+		_popupMenu = new JPopupMenu();
+		_miCloseTab = new JMenuItem(MENU_ITEM_CLOSE);
+		_miCloseTab.addActionListener(this);
+		_miCloseTab.setActionCommand(ACTION_CLOSE_TAB);
+		_popupMenu.add(_miCloseTab);
+		_miCloseAllButThisTab = new JMenuItem(MENU_ITEM_CLOSE_ALL_BUT_THIS);
+		_miCloseAllButThisTab.addActionListener(this);
+		_miCloseAllButThisTab.setActionCommand(ACTION_CLOSE_ALL_BUT_THIS_TAB);
+		_popupMenu.add(_miCloseAllButThisTab);
+		_miCloseAllTab = new JMenuItem(MENU_ITEM_CLOSE_ALL);
+		_miCloseAllTab.addActionListener(this);
+		_miCloseAllTab.setActionCommand(ACTION_CLOSE_ALL_TAB);
+		_popupMenu.add(_miCloseAllTab);
+		_miSaveTab = new JMenuItem(MENU_ITEM_SAVE);
+		_miSaveTab.addActionListener(this);
+		_miSaveTab.setActionCommand(ACTION_SAVE_TAB);
+		_popupMenu.add(_miSaveTab);
 		_outputTabbedPane.addMouseListener(
 				new MouseAdapter() {
 					private void popup(MouseEvent e) {
 						if (e.isPopupTrigger()) {
 							// only show popup if at least one tab exists
-							if (_outputTabbedPane.getSelectedIndex() > -1) {
-								popupMenu.show((JComponent) e.getSource(), e.getX(), e.getY());
+							int tabCount = _outputTabbedPane.getTabCount();
+							if (tabCount > 0) {
+								_miCloseTab.setEnabled(true);
+								_miSaveTab.setEnabled(true);
+								if (tabCount > 1) {
+									_miCloseAllTab.setEnabled(true);
+									_miCloseAllButThisTab.setEnabled(true);
+								} else {
+									_miCloseAllTab.setEnabled(false);
+									_miCloseAllButThisTab.setEnabled(false);
+								}
+								_popupMenu.show((JComponent) e.getSource(), e.getX(), e.getY());
 							}
 						}
 					}
@@ -226,7 +292,12 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 		);
 	}
 
-	/**
+    public void setWorkingCopy( String workingCopy ) {
+        SVNTreeModel svnTreeModel = new SVNTreeModel( workingCopy, false);
+        _svnTree.setModel(new DefaultTreeModel(JSVNTree.buildTreeNode(svnTreeModel)));
+    }
+
+    /**
 	 * executes the given command with the given arguments
 	 * @param command command to be run
 	 * @param args arguments for the command
@@ -237,14 +308,17 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 			command.init(args);
 			command.execute();
 			String result = command.getResult();
-			_historyTextPane.setText(_historyTextPane.getText() + command.getCommand() + "\n");
+			_historyTextPane.setText(_historyTextPane.getText() + command.getCommand() + NEWLINE_CHARACTER);
 			JTextPane newPane = new JTextPane();
+
+            Font fixedFont = new Font("Monospaced", Font.PLAIN, 10 );
+            newPane.setFont( fixedFont );
 			newPane.setText(result);
 			newPane.setEditable(false);
 			JScrollPane scrollPane = new JScrollPane(newPane);
 			String commandName = command.getClass().getName();
-			_outputTabbedPane.add(commandName.substring(commandName.lastIndexOf(".") +1), scrollPane);
-			_outputTabbedPane.setSelectedIndex(_outputTabbedPane.getTabCount() -1);
+			_outputTabbedPane.add(commandName.substring(commandName.lastIndexOf(PERIOD_CHARACTER) + 1), scrollPane);
+			_outputTabbedPane.setSelectedIndex(_outputTabbedPane.getTabCount() - 1);
 		} finally {
 			_statusBar.setText(STATUS_READY);
 		}
@@ -263,6 +337,71 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals(ACTION_CLOSE_TAB)) {
 			_outputTabbedPane.remove(_outputTabbedPane.getSelectedIndex());
+		} else if (e.getActionCommand().equals(ACTION_CLOSE_ALL_TAB)) {
+			for (int i = _outputTabbedPane.getTabCount(); i > 0; i--) {
+				_outputTabbedPane.remove(i - 1);
+			}
+		} else if (e.getActionCommand().equals(ACTION_CLOSE_ALL_BUT_THIS_TAB)) {
+			int index = _outputTabbedPane.getSelectedIndex();
+			// delete tabs after this one
+			for (int i = _outputTabbedPane.getTabCount() - 1; i > index; i--) {
+				_outputTabbedPane.remove(i);
+			}
+			// delete all preceding tabs
+			for (int i = 0; i < index; i++) {
+				_outputTabbedPane.remove(0);
+			}
+		} else if (e.getActionCommand().equals(ACTION_SAVE_TAB)) {
+			JFileChooser chooser;
+			String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+			if (workingDirectory != null) {
+				File currentWorkingDirectory = new File(workingDirectory);
+				if (currentWorkingDirectory.exists()) {
+					chooser = new JFileChooser(currentWorkingDirectory);
+				} else {
+					chooser = new JFileChooser();
+				}
+			} else {
+				chooser = new JFileChooser();
+			}
+
+			chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+			int action = chooser.showOpenDialog(new JFrame());
+			if (action == JFileChooser.APPROVE_OPTION) {
+				try {
+					File file = new File(chooser.getSelectedFile().getCanonicalPath());
+					if (file.exists()) {
+						// prompt to overwrite
+						int confirmation = JOptionPane.showConfirmDialog(this, OVERWRITE_EXISTING_FILE, CONFIRMATION, JOptionPane.OK_CANCEL_OPTION);
+						if (confirmation == JOptionPane.OK_OPTION) {
+							writeSelectedTabToFile(file);
+						}
+					} else {
+						writeSelectedTabToFile(file);
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 		}
 	}
+
+	/**
+	 * writes a selected tab's text to a given file
+	 * @param file
+	 * @throws IOException
+	 */
+	private void writeSelectedTabToFile(File file) throws IOException {
+		Writer writer = new BufferedWriter(new FileWriter(file));
+		JScrollPane scrollpane = (JScrollPane) _outputTabbedPane.getSelectedComponent();
+		JTextPane textPane = (JTextPane) scrollpane.getViewport().getComponent(0);
+		writer.write(textPane.getText());
+		writer.flush();
+		writer.close();
+	}
+
+    public JPanel getContent() {
+        return content;
+    }
+
 }

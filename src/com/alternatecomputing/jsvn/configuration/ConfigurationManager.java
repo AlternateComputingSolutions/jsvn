@@ -14,8 +14,6 @@ public class ConfigurationManager {
 
 	private static final String CONFIG_LOCATION = ".jsvn" + File.separator + "config";
 	private static final String JSVN_WORKING_COPY = "jsvn.working_copy";
-	private static final String JSVN_USERNAME = "jsvn.username";
-	private static final String JSVN_PASSWORD = "jsvn.password";
 	private static ConfigurationManager _instance;
 	private Configuration _config;
 	private Properties _props = new Properties();
@@ -67,8 +65,6 @@ public class ConfigurationManager {
 				_props.load(new FileInputStream(_configFile));
 				_config = new Configuration();
 				_config.setWorkingCopy(_props.getProperty(JSVN_WORKING_COPY));
-				_config.setUsername(_props.getProperty(JSVN_USERNAME));
-				_config.setPassword(_props.getProperty(JSVN_PASSWORD));
 			}
 
 		} catch (FileNotFoundException e) {
@@ -87,8 +83,6 @@ public class ConfigurationManager {
 
 			// update the configuration properties
 			_props.setProperty(JSVN_WORKING_COPY, _config.getWorkingCopy());
-			_props.setProperty(JSVN_USERNAME, _config.getUsername());
-			_props.setProperty(JSVN_PASSWORD, _config.getPassword());
 
 			// write to file
 			if (createConfigDir()) {
@@ -111,7 +105,6 @@ public class ConfigurationManager {
 		_config = config;
 	}
 
-
 	/**
 	 * get the working copy value from the Configuration object
 	 * @return Working copy value
@@ -126,22 +119,6 @@ public class ConfigurationManager {
 	 */
 	public String getWorkingDirectory() {
 		return _config.getWorkingDirectory();
-	}
-
-	/**
-	 * get the username from the Configuration object
-	 * @return username
-	 */
-	public String getUsername() {
-		return _config.getUsername();
-	}
-
-	/**
-	 * get the password from the Configuration object
-	 * @return password
-	 */
-	public String getPassword() {
-		return _config.getPassword();
 	}
 
 	/**

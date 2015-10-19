@@ -10,8 +10,6 @@ public class Configuration implements Cloneable {
 
 	private String _workingCopy;
 	private String _workingDirectory;
-	private String _username;
-	private String _password;
 
 	/**
 	 * returns the working copy directory
@@ -43,45 +41,11 @@ public class Configuration implements Cloneable {
 	}
 
 	/**
-	 * returns the username
-	 * @return username
-	 */
-	public String getUsername() {
-		return _username;
-	}
-
-	/**
-	 * sets the username
-	 * @param username username to use for authentication
-	 */
-	public void setUsername(String username) {
-		this._username = StringUtil.normalizeFileEncoding(username);
-	}
-
-	/**
-	 * returns the password
-	 * @return password
-	 */
-	public String getPassword() {
-		return _password;
-	}
-
-	/**
-	 * sets the password
-	 * @param password password to use for authentication
-	 */
-	public void setPassword(String password) {
-		_password = StringUtil.normalizeFileEncoding(password);
-	}
-
-	/**
 	 * sets all properties from another Configuration object
 	 * @param config Configuration object which contains values to use
 	 */
 	public void setValues(Configuration config) {
 		setWorkingCopy(config.getWorkingCopy());
-		setUsername(config.getUsername());
-		setPassword(config.getPassword());
 	}
 
 	/**
@@ -91,8 +55,6 @@ public class Configuration implements Cloneable {
 	public Object clone() {
 		Configuration c = new Configuration();
 		c.setWorkingCopy(getWorkingCopy());
-		c.setUsername(getUsername());
-		c.setPassword(getPassword());
 		return c;
 	}
 }

@@ -19,7 +19,7 @@ public class CommandRunner {
 	 * returns the output from stdout from an executed command
 	 * @return output from stdout
 	 */
-	public String getOuput() {
+	public String getOutput() {
 		return _output;
 	}
 
@@ -35,12 +35,19 @@ public class CommandRunner {
 	 * runs the given command
 	 * @param command subversion command to run
 	 */
-	public synchronized void runCommand(String command) {
+	public synchronized void runCommand(String command) throws CommandException {
 		Runtime rt = Runtime.getRuntime();
 		try {
 
 			// execute the command
-			Process proc = rt.exec(command, null, new File(ConfigurationManager.getInstance().getWorkingCopy()));
+			String workingCopy = ConfigurationManager.getInstance().getWorkingCopy();
+			File dir;
+			if (workingCopy != null) {
+				dir = new File(workingCopy);
+			} else {
+				dir = new File(System.getProperty("user.home"));
+			}
+			Process proc = rt.exec(command, null, dir);
 
 			// get standard stream references
 			InputStream stdout = proc.getInputStream();
@@ -78,7 +85,7 @@ public class CommandRunner {
 			proc.destroy();
 		} catch (IOException e) {
 			// error getting stream references
-			e.printStackTrace();
+			throw new CommandException(e.getMessage());
 		}
 	}
 

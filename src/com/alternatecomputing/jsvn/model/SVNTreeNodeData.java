@@ -46,6 +46,7 @@ public class SVNTreeNodeData {
 
 	private SVNTreeNodeData _parent;
 	private AbstractList _children;
+	private long _length;
 
 
 	/**

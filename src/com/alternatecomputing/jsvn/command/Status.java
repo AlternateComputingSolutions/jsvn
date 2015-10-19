@@ -75,7 +75,7 @@ import java.util.Map;
  *	  --no-ignore              : disregard default and svn:ignore property ignores
  */
 public class Status extends Command {
-	private static final String COMMAND = "svn status {0} {1} {2} {3} {4}";
+	private static final String COMMAND = "svn status {0} {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String SHOW_UPDATES = "SHOW_UPDATES";
 	public static final String TARGETS = "TARGETS";
 	public static final String VERBOSE = "VERBOSE";
@@ -84,8 +84,8 @@ public class Status extends Command {
 
 	public void init(Map args) throws CommandException {
 		String targets = (String) args.get(TARGETS);
-		if (targets == null) {
-			throw new CommandException("Missing targets");
+		if (targets == null || "".equals(targets.trim())) {
+			throw new CommandException("Missing target(s)");
 		}
 
 		Boolean verbose = (Boolean) args.get(VERBOSE);
@@ -115,10 +115,8 @@ public class Status extends Command {
 		Boolean showUpdates = (Boolean) args.get(SHOW_UPDATES);
 		String showUpdatesOption;
 		if (Boolean.TRUE == showUpdates) {
-			_mustAuthenticate = true;
 			showUpdatesOption = "-u";
 		} else {
-			_mustAuthenticate = false;
 			showUpdatesOption = "";
 		}
 

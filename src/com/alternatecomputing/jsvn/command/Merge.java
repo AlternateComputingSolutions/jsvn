@@ -37,7 +37,7 @@ import java.text.MessageFormat;
  *   --non-interactive        : do no interactive prompting
  */
 public class Merge extends Command {
-	private static final String COMMAND = "svn merge {0} {1} {2} {3} {4}";   // non-recursive, dry-run, source1, source2, target
+	private static final String COMMAND = "svn merge {0} {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;   // non-recursive, dry-run, source1, source2, target
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String DRY_RUN = "DRY_RUN";
 	public static final String SOURCE1 = "SOURCE1";
@@ -45,20 +45,18 @@ public class Merge extends Command {
 	public static final String TARGET = "TARGET";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = true;
-
 		String source1 = (String) args.get(SOURCE1);
-		if (source1 == null) {
+		if (source1 == null || "".equals(source1.trim())) {
 			throw new CommandException("Missing first source");
 		}
 
 		String source2 = (String) args.get(SOURCE2);
-		if (source2 == null) {
+		if (source2 == null || "".equals(source2.trim())) {
 			throw new CommandException("Missing second source");
 		}
 
 		String target = (String) args.get(TARGET);
-		if (target == null) {
+		if (target == null || "".equals(target.trim())) {
 			throw new CommandException("Missing target");
 		}
 

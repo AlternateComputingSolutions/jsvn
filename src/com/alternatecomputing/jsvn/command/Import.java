@@ -31,25 +31,23 @@ public class Import extends Command {
 	public static final String REPOS_URL = "REPOS_URL";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = true;
-
 		String url = (String) args.get(REPOS_URL);
-		if (url == null) {
+		if (url == null || "".equals(url.trim())) {
 			throw new CommandException("Missing url");
 		}
 
 		String path = (String) args.get(PATH);
-		if (path == null) {
+		if (path == null || "".equals(path.trim())) {
 			throw new CommandException("Missing path");
 		}
 
 		String newEntry = (String) args.get(NEW_ENTRY_IN_REPOS);
-		if (newEntry == null) {
+		if (newEntry == null || "".equals(newEntry.trim())) {
 			throw new CommandException("Missing new entry");
 		}
 
 		String commitMessage = (String) args.get(COMMIT_MESSAGE);
-		if (commitMessage == null) {
+		if (commitMessage == null || "".equals(commitMessage.trim()) ) {
 			throw new CommandException("Missing commit message");
 		}
 

@@ -23,15 +23,13 @@ public class Cat extends Command {
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
-		_mustAuthenticate = false;
-
 		String targets = (String) args.get(TARGETS);
-		if (targets == null) {
-			throw new CommandException("Missing targets");
+		if (targets == null || "".equals(targets.trim())) {
+			throw new CommandException("Missing target(s)");
 		}
 
 		String revision = (String) args.get(REVISION);
-		if (revision != null) {
+		if (revision != null  && !"".equals(revision)) {
 			revision = "-r " + revision;
 		} else {
 			revision = "";

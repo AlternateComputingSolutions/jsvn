@@ -1,0 +1,18 @@
+<idea-plugin>
+    <name>Jsvn</name>
+    <description>Subversion Client</description>
+    <version>0.5</version>
+    <vendor>Jsvn</vendor>
+    <idea-version min="3.0" max="4.0"/>
+
+    <project-components>
+        <component>
+            <implementation-class>com.alternatecomputing.jsvn.idea.JsvnComponent</implementation-class>
+        </component>
+
+        <component>
+            <implementation-class>com.alternatecomputing.jsvn.idea.JsvnVcsAdapter</implementation-class>
+        </component>
+    </project-components>
+
+</idea-plugin>

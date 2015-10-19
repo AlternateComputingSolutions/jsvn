@@ -150,15 +150,13 @@ public class UpdateDialog extends CommandDialog {
      * @return implementation of Command to execute with the given configured args
      */
     protected Command buildCommand(Map args) {
-		if (jRadioButton1.isSelected()) {
-			if (jTextField1.getText().length() == 0) {
-				args.put(Update.REVISION, "HEAD");
-			} else {
-				args.put(Update.REVISION, jTextField1.getText());
-			}
+		String revision = jTextField1.getText().trim();
+		if (jRadioButton1.isSelected() && revision.length() > 0) {
+			args.put(Update.REVISION, revision);
 		}
-		if (jRadioButton2.isSelected()) {
-			args.put(Update.REVISION, "{" + jTextField2.getText() + "}");
+		String date = jTextField2.getText().trim();
+		if (jRadioButton2.isSelected() && date.length() > 0) {
+			args.put(Update.REVISION, "{" + date + "}");
 		}
 		if (jCheckBox1.isSelected()) {
 			args.put(Update.NONRECURSIVE, Boolean.TRUE);

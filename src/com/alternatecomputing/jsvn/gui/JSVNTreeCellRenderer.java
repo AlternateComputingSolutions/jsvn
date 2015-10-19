@@ -1,5 +1,6 @@
 package com.alternatecomputing.jsvn.gui;
 
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import com.alternatecomputing.jsvn.model.SVNTreeNodeData;
 
 import javax.swing.Icon;
@@ -9,6 +10,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import java.awt.Color;
 import java.awt.Component;
+import java.io.File;
 
 /**
  *
@@ -85,17 +87,24 @@ public class JSVNTreeCellRenderer extends DefaultTreeCellRenderer {
 			setForeground(Color.gray);
 		}
 
+		
 		StringBuffer tipText = new StringBuffer("<html>Path: ").append(data.getPath()).append("<br>Name: ").append(data.getName());
 		if (data.getRevision() != SVNTreeNodeData.NOT_VERSIONED && data.getRevision() != SVNTreeNodeData.UNKNOWN_VERSION) {
 			tipText.append("<br>Revision: ").append(data.getRevision());
 		}
 		tipText.append("<br>Node kind: ").append(data.getNodeKind() == SVNTreeNodeData.NODE_KIND_DIRECTORY ? "directory" : "file");
+
+		if (data.getNodeKind() == SVNTreeNodeData.NODE_KIND_FILE) {
+			File f = new File(ConfigurationManager.getInstance().getWorkingDirectory()+data.getPath());
+			tipText.append("<br>Length: ").append(f.length()).append(" bytes");
+		}
 		if (data.getLastChangedAuthor() != null) {
 			tipText.append("<br>Last Changed Author: ").append(data.getLastChangedAuthor());
 		}
 		if (data.getLastChangedRevision() != SVNTreeNodeData.NOT_VERSIONED && data.getLastChangedRevision() != SVNTreeNodeData.UNKNOWN_VERSION) {
 			tipText.append("<br>Last Changed Rev: ").append(data.getLastChangedRevision()).append("</html>");
 		}
+		
 		setToolTipText(tipText.toString());
 
 		return this;
