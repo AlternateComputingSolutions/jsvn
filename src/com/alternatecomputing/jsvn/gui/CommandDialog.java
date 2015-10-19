@@ -2,6 +2,7 @@ package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.command.Command;
 import com.alternatecomputing.jsvn.command.CommandException;
+import com.alternatecomputing.jsvn.command.Commandable;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -66,7 +67,7 @@ public abstract class CommandDialog extends CenterableDialog implements JSVNEven
 	 * @param args map of arguments to be passed into the returned command
 	 * @return implementation of Command to execute with the given configured args
 	 */
-	protected abstract Command buildCommand(Map args);
+	protected abstract Commandable buildCommand(Map args);
 
 	/**
 	 * gets the panel in which all options for the command are configured
@@ -80,7 +81,7 @@ public abstract class CommandDialog extends CenterableDialog implements JSVNEven
 	 */
 	protected void runCommand() throws CommandException {
 		Map args = new HashMap();
-		Command command = buildCommand(args);
+		Commandable command = buildCommand(args);
 
 		// create the executor
 		JSVNCommandExecutor executor = new JSVNCommandExecutor(command, args);

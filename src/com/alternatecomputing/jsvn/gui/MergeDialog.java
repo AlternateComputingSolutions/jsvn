@@ -1,7 +1,8 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Merge;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -177,7 +178,7 @@ public class MergeDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		if (jRadioButton1.isSelected()) {
 			args.put(Merge.SOURCE1, jTextField1.getText());
 			args.put(Merge.SOURCE2, jTextField3.getText());

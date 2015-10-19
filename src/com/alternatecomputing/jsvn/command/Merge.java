@@ -36,7 +36,7 @@ import java.text.MessageFormat;
  *   --no-auth-cache          : do not cache authentication tokens
  *   --non-interactive        : do no interactive prompting
  */
-public class Merge extends Command {
+public class Merge extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn merge {0} {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;   // non-recursive, dry-run, source1, source2, target
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String DRY_RUN = "DRY_RUN";
@@ -45,6 +45,8 @@ public class Merge extends Command {
 	public static final String TARGET = "TARGET";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String source1 = (String) args.get(SOURCE1);
 		if (source1 == null || "".equals(source1.trim())) {
 			throw new CommandException("Missing first source");

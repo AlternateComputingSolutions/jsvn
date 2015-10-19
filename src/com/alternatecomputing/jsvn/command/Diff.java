@@ -45,6 +45,8 @@ public class Diff extends Command {
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String targets = (String) args.get(TARGETS);
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");
@@ -59,7 +61,7 @@ public class Diff extends Command {
 
 		String extensions = (String) args.get(EXTENSIONS);
 		if (extensions != null && !"".equals(extensions.trim())) {
-			extensions = "-x " + extensions;
+			extensions = "--diff-cmd diff -x " + extensions;
 		} else {
 			extensions = "";
 		}

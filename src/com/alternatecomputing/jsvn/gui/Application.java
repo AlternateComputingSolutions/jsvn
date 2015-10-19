@@ -1,11 +1,11 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
-import com.alternatecomputing.jsvn.command.CommandRunner;
 import com.alternatecomputing.jsvn.command.CommandException;
+import com.alternatecomputing.jsvn.command.CommandRunner;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
-import javax.swing.JOptionPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import java.awt.Dimension;
 import java.awt.Toolkit;
@@ -28,7 +28,7 @@ public class Application {
 
 		try {
 			CommandRunner runner = new CommandRunner();
-			runner.runCommand("svn --version");
+			runner.runCommand(ConfigurationManager.getInstance().getWorkingCopy(), "svn --version");
 			SVN_CMD_VERSION = runner.getOutput();
 
 		} catch (CommandException ex) {
@@ -66,4 +66,12 @@ public class Application {
 	public static Frame getApplicationFrame() {
 		return _applicationFrame;
 	}
+
+    /**
+     * Set the application's main GUI frame
+     * @param frame
+     */
+    public static void setApplicationFrame( Frame frame ) {
+        _applicationFrame = frame;
+    }
 }

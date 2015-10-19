@@ -25,7 +25,7 @@ import java.util.Map;
  *   --no-auth-cache          : do not cache authentication tokens
  *   --non-interactive        : do no interactive prompting
  */
-public class Checkout extends Command {
+public class Checkout extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn checkout {0} {1} {2} {3} {4} {5} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String DESTINATION = "DESTINATION";
 	public static final String REVISION = "REVISION";
@@ -35,6 +35,8 @@ public class Checkout extends Command {
 	public static final String PASSWORD = "PASSWORD";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String url = (String) args.get(REPOS_URL);
 		if (url == null || "".equals(url.trim())) {
 			throw new CommandException("Missing url");

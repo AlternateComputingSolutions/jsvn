@@ -30,13 +30,15 @@ import java.text.MessageFormat;
  *   --force                  : force operation to run
  *   --encoding arg           : treat value as being in charset encoding ARG
  */
-public class Move extends Command {
+public class Move extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn move {0} {1} {2} " + Command.NON_INTERACTIVE_MODIFIER;	// revision, source, destination
 	public static final String SOURCE = "SOURCE";
 	public static final String DESTINATION = "DESTINATION";
 	public static final String REVISION = "REVISION";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String source = (String) args.get(SOURCE);
 		if (source == null || "".equals(source.trim())) {
 			throw new CommandException("Missing source");

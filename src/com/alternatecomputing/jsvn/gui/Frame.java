@@ -1,12 +1,16 @@
 package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.Constants;
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
+import com.alternatecomputing.jsvn.command.Diff;
+import com.alternatecomputing.jsvn.command.WorkingCopyModifiable;
 import com.alternatecomputing.jsvn.configuration.Configuration;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import com.alternatecomputing.jsvn.model.SVNTreeModel;
+import com.alternatecomputing.jsvn.model.SVNTreeNodeData;
 
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,9 +23,19 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextPane;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.TableColumn;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Document;
+import javax.swing.text.Highlighter;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -37,6 +51,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.StringTokenizer;
 
 
 /**
@@ -73,6 +88,8 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 	private static final String STATUS_EXECUTING = "Executing...";
 	private static final String STATUS_REFRESHING = "Refreshing...";
 	private static final String TAB_COMMAND_HISTORY = "Command History";
+	private static final String TAB_DIRECTORY_BROWSER = "Directory Browser";
+	private static final int DIRECTORY_BROWSER_TABLE_INDEX = 0;
 	private JPanel content;
 	private JLabel _statusBar = new JLabel(STATUS_READY);
 	private JTabbedPane _outputTabbedPane = new JTabbedPane();
@@ -80,6 +97,9 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 	private JSVNTree _svnTree;
 	private JPopupMenu _popupMenu;
 	private JMenuItem _miCloseTab, _miCloseAllTab, _miCloseAllButThisTab, _miSaveTab;
+	private JTable _directoryBrowserTable;
+	private DirectoryBrowserTableModel _directoryBrowserTableModel;
+
 
 	/**
 	 * constructor
@@ -226,9 +246,20 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 		// install the new tree model
 		SVNTreeModel model = new SVNTreeModel(ConfigurationManager.getInstance().getWorkingCopy(), false);
 		_svnTree = new JSVNTree(model);
+		_svnTree.addTreeSelectionListener(new WorkingCopySelectionListener());
 		JScrollPane svnPane = new JScrollPane();
 		svnPane.setViewportView(_svnTree);
 		mainSplitPane.add(svnPane, JSplitPane.LEFT);
+
+		_directoryBrowserTableModel = new DirectoryBrowserTableModel();
+		_directoryBrowserTable = new JTable(_directoryBrowserTableModel);
+		DirectoryBrowserCellRenderer renderer = new DirectoryBrowserCellRenderer();
+		for (int i = 0; i < _directoryBrowserTable.getColumnModel().getColumnCount(); i++) {
+			TableColumn column = _directoryBrowserTable.getColumnModel().getColumn(i);
+			column.setCellRenderer(renderer);
+		}
+		_outputTabbedPane.add(new JScrollPane(_directoryBrowserTable), TAB_DIRECTORY_BROWSER);
+
 
 		// create the right split pane
 		rightSplitPane.setOrientation(JSplitPane.VERTICAL_SPLIT);
@@ -266,6 +297,7 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 		_miSaveTab.addActionListener(this);
 		_miSaveTab.setActionCommand(ACTION_SAVE_TAB);
 		_popupMenu.add(_miSaveTab);
+
 		_outputTabbedPane.addMouseListener(
 				new MouseAdapter() {
 					private void popup(MouseEvent e) {
@@ -273,8 +305,6 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 							// only show popup if at least one tab exists
 							int tabCount = _outputTabbedPane.getTabCount();
 							if (tabCount > 0) {
-								_miCloseTab.setEnabled(true);
-								_miSaveTab.setEnabled(true);
 								if (tabCount > 1) {
 									_miCloseAllTab.setEnabled(true);
 									_miCloseAllButThisTab.setEnabled(true);
@@ -283,6 +313,13 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 									_miCloseAllButThisTab.setEnabled(false);
 								}
 								_popupMenu.show((JComponent) e.getSource(), e.getX(), e.getY());
+							}
+							if (_outputTabbedPane.getSelectedIndex() == DIRECTORY_BROWSER_TABLE_INDEX) {
+								_miSaveTab.setEnabled(false);
+								_miCloseTab.setEnabled(false);
+							} else {
+								_miSaveTab.setEnabled(true);
+								_miCloseTab.setEnabled(true);
 							}
 						}
 					}
@@ -312,6 +349,44 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 	}
 
 	/**
+	 * adds a highlighter to the given editor pane (useful only for Diff output)
+	 * @param newPane pane to be highlighted
+	 * @param addition character signifying an addition
+	 * @param removal character signifying a removal
+	 */
+	private void addHighlightersToTextPane(JEditorPane newPane, char addition, char removal) {
+		Highlighter.HighlightPainter addPainter = new DefaultHighlighter.DefaultHighlightPainter(new Color(196, 255, 196));
+		Highlighter.HighlightPainter removePainter = new DefaultHighlighter.DefaultHighlightPainter(new Color(196, 196, 255));
+		Document doc = newPane.getDocument();
+		try {
+			String body = doc.getText(0, doc.getLength());
+			int startPos = body.indexOf(addition);
+			int endPos = 0;
+
+			while (startPos != -1) {
+				endPos = body.indexOf(Constants.NEWLINE_CHAR, startPos);
+				if (body.charAt(startPos - 1) == Constants.NEWLINE_CHAR) {
+					newPane.getHighlighter().addHighlight(startPos, endPos, addPainter);
+				}
+				startPos = body.indexOf(addition, endPos);
+			}
+			startPos = body.indexOf(removal);
+
+			while (startPos != -1) {
+				endPos = body.indexOf(Constants.NEWLINE_CHAR, startPos);
+				int pos = (startPos > 0) ? startPos - 1 : 0;
+				if (body.charAt(pos) == Constants.NEWLINE_CHAR || pos == 0) {
+					newPane.getHighlighter().addHighlight(startPos, endPos, removePainter);
+				}
+				startPos = body.indexOf(removal, endPos);
+			}
+		} catch (BadLocationException e) {
+			// XXX - log error
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * exit the Application
 	 */
 	private void exitForm(WindowEvent evt) {
@@ -326,7 +401,7 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 		if (e.getActionCommand().equals(ACTION_CLOSE_TAB)) {
 			_outputTabbedPane.remove(_outputTabbedPane.getSelectedIndex());
 		} else if (e.getActionCommand().equals(ACTION_CLOSE_ALL_TAB)) {
-			for (int i = _outputTabbedPane.getTabCount(); i > 0; i--) {
+			for (int i = _outputTabbedPane.getTabCount(); i > 1; i--) {
 				_outputTabbedPane.remove(i - 1);
 			}
 		} else if (e.getActionCommand().equals(ACTION_CLOSE_ALL_BUT_THIS_TAB)) {
@@ -336,8 +411,8 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 				_outputTabbedPane.remove(i);
 			}
 			// delete all preceding tabs
-			for (int i = 0; i < index; i++) {
-				_outputTabbedPane.remove(0);
+			for (int i = 1; i < index; i++) {
+				_outputTabbedPane.remove(1);
 			}
 		} else if (e.getActionCommand().equals(ACTION_SAVE_TAB)) {
 			JFileChooser chooser;
@@ -425,19 +500,85 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 				JOptionPane.showMessageDialog(Application.getApplicationFrame().getContentPane(), error);
 			} else {
 				// create a new output tab
-				Command command = ((JSVNCommandEvent) event).getCommand();
+				Commandable command = ((JSVNCommandEvent) event).getCommand();
 				String result = ((JSVNCommandEvent) event).getResult();
-				_historyTextPane.setText(_historyTextPane.getText() + command.getCommand() + Constants.NEWLINE_CHARACTER);
+				_historyTextPane.setText(_historyTextPane.getText() + command.getCommand() + Constants.NEWLINE);
 				JTextPane newPane = new JTextPane();
 				Font fixedFont = new Font("Monospaced", Font.PLAIN, 10);
 				newPane.setFont(fixedFont);
 				newPane.setText(result);
 				newPane.setEditable(false);
+
+				// only highlight diff output
+				if (command instanceof Diff) {
+					if (command.getArgs().get(Diff.EXTENSIONS) != null) {
+						addHighlightersToTextPane(newPane, '>', '<');
+					} else {
+						addHighlightersToTextPane(newPane, '+', '-');
+					}
+				}
+
 				JScrollPane scrollPane = new JScrollPane(newPane);
 				String commandName = command.getClass().getName();
-				_outputTabbedPane.add(commandName.substring(commandName.lastIndexOf(Constants.PERIOD_CHARACTER) + 1), scrollPane);
+				_outputTabbedPane.add(commandName.substring(commandName.lastIndexOf(Constants.PERIOD) + 1), scrollPane);
 				_outputTabbedPane.setSelectedIndex(_outputTabbedPane.getTabCount() - 1);
-				_svnTree.refresh(false);
+
+				// refresh the model only for commans that may have changed the contents of the working copy
+				if (command instanceof WorkingCopyModifiable) {
+					_svnTree.refresh(false);
+				}
+			}
+		}
+	}
+
+	/**
+	 *
+	 * @param node
+	 * @return
+	 */
+	private String buildFileName(DefaultMutableTreeNode node) {
+		StringTokenizer token = new StringTokenizer(node.toString(), " ");
+		String name = token.nextToken();
+
+		switch (node.getLevel()) {
+			case 0:
+				return ConfigurationManager.getInstance().getWorkingCopy();
+			case 1:
+				return ConfigurationManager.getInstance().getWorkingCopy() + Constants.SVN_PATH_SEPARATOR + name;
+			default:
+				return buildFileName((DefaultMutableTreeNode) node.getParent()) + Constants.SVN_PATH_SEPARATOR + name;
+		}
+	}
+
+	/**
+	 *
+	 * @return
+	 */
+	public String getWorkingCopy() {
+		return ConfigurationManager.getInstance().getWorkingCopy();
+	}
+
+
+	/**
+	 *
+	 */
+	private class WorkingCopySelectionListener implements TreeSelectionListener {
+		public void valueChanged(TreeSelectionEvent e) {
+			DefaultMutableTreeNode node = (DefaultMutableTreeNode) _svnTree.getLastSelectedPathComponent();
+
+			if (node == null) {
+				return;
+			}
+
+			SVNTreeNodeData svnNode = (SVNTreeNodeData) node.getUserObject();
+			String fileName = buildFileName(node);
+			File file = new File(fileName);
+			if (_directoryBrowserTableModel != null) {
+				if (file.isDirectory()) {
+					_directoryBrowserTableModel.setPathToBrowse(svnNode, file);
+				} else {
+					_directoryBrowserTableModel.clearPathToBrowse();
+				}
 			}
 		}
 	}

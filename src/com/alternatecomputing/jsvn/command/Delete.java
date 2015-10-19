@@ -26,11 +26,13 @@ import java.util.Map;
  *	  --password arg           : specify a password ARG
  *	  --message-encoding arg   : take log message in charset encoding ARG
  */
-public class Delete extends Command {
+public class Delete extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn delete {0}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String targets = (String) args.get(TARGETS);
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");

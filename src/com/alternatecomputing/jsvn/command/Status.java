@@ -74,7 +74,7 @@ import java.util.Map;
  *	  --non-interactive        : do no interactive prompting
  *	  --no-ignore              : disregard default and svn:ignore property ignores
  */
-public class Status extends Command {
+public class Status extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn status {0} {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String SHOW_UPDATES = "SHOW_UPDATES";
 	public static final String TARGETS = "TARGETS";
@@ -83,6 +83,8 @@ public class Status extends Command {
 	public static final String QUIET = "QUIET";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String targets = (String) args.get(TARGETS);
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");

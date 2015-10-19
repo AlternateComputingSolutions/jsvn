@@ -13,5 +13,7 @@ import java.util.Map;
 public class PropList extends Command {
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 	}
 }

@@ -1,5 +1,7 @@
 package com.alternatecomputing.jsvn.configuration;
 
+import com.alternatecomputing.jsvn.Constants;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,7 +19,7 @@ public class ConfigurationManager {
 	private static ConfigurationManager _instance;
 	private Configuration _config;
 	private Properties _props = new Properties();
-	private String _userHome = System.getProperty("user.home");
+	private String _userHome = System.getProperty(Constants.USER_HOME);
 	private File _configFile = new File(_userHome + File.separator + CONFIG_LOCATION);
 
 	/**

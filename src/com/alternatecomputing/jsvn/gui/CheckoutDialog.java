@@ -1,9 +1,9 @@
 package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.command.Checkout;
-import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.configuration.Configuration;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -306,7 +306,7 @@ public class CheckoutDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		args.put(Checkout.REPOS_URL, jTextField1.getText().trim());
 		args.put(Checkout.DESTINATION, jTextField2.getText().trim());
 		args.put(Checkout.USERNAME, jTextField4.getText().trim());

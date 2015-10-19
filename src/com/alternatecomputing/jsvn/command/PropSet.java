@@ -31,7 +31,7 @@ import java.util.Map;
  *	  --targets arg            : pass contents of file "ARG" as additional args
  *	  -R [--recursive]         : descend recursively
  */
-public class PropSet extends Command {
+public class PropSet extends Command implements WorkingCopyModifiable {
 
 	private static final String COMMAND = "svn propset {0} {1} {2} {3} {4}";
 
@@ -43,6 +43,7 @@ public class PropSet extends Command {
 	public static final String QUIET = "QUIET";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
 
 		Boolean nonRecursive = (Boolean) args.get(NONRECURSIVE);
 		String nonRecursiveOption;

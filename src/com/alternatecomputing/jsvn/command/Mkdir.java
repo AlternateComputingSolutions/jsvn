@@ -16,8 +16,10 @@ import java.util.Map;
  *	  --password arg           : specify a password ARG
  *	  --message-encoding arg   : take log message in charset encoding ARG
  */
-public class Mkdir extends Command {
+public class Mkdir extends Command implements WorkingCopyModifiable {
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 	}
 }

@@ -3,14 +3,14 @@ package com.alternatecomputing.jsvn.ant;
 import com.alternatecomputing.jsvn.command.Checkout;
 import com.alternatecomputing.jsvn.command.Command;
 import com.alternatecomputing.jsvn.command.CommandException;
+import com.alternatecomputing.jsvn.command.Commandable;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
 
 public class SvnCheckout extends AbstractSvnTask {
 
@@ -24,7 +24,7 @@ public class SvnCheckout extends AbstractSvnTask {
 	private boolean recursive = true;
 	private File destination;
 
-	public Command buildCommand() throws CommandException{
+	public Commandable buildCommand() throws CommandException{
 
 		Map args = new HashMap();
 		args.put(Checkout.REPOS_URL,  getRepositoryUrl());
@@ -38,9 +38,9 @@ public class SvnCheckout extends AbstractSvnTask {
 
 		return command;
 	}
-	
+
 	public void execute() throws BuildException {
-		log("checking out : " + getRepositoryUrl(),Project.MSG_INFO);	
+		log("checking out : " + getRepositoryUrl(),Project.MSG_INFO);
 		super.execute();
 	}
 

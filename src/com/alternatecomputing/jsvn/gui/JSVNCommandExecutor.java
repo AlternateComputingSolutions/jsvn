@@ -1,7 +1,7 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
 import com.alternatecomputing.jsvn.command.CommandException;
+import com.alternatecomputing.jsvn.command.Commandable;
 
 import javax.swing.SwingUtilities;
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.Map;
  * events that may be of interest.
  */
 public class JSVNCommandExecutor implements Runnable {
-	private Command _command;
+	private Commandable _command;
 	private Map _args;
 	private Collection _jsvnEventListeners;
 
@@ -23,7 +23,7 @@ public class JSVNCommandExecutor implements Runnable {
 	 * @param command JSVN command to execute
 	 * @param args arguments to initialize the command with
 	 */
-	public JSVNCommandExecutor(Command command, Map args) {
+	public JSVNCommandExecutor(Commandable command, Map args) {
 		_command = command;
 		_args = args;
 		_jsvnEventListeners = new HashSet();
@@ -46,7 +46,10 @@ public class JSVNCommandExecutor implements Runnable {
 			public void run() {
 				for (Iterator iterator = _jsvnEventListeners.iterator(); iterator.hasNext();) {
 					JSVNEventListener jsvnEventListener = (JSVNEventListener) iterator.next();
-					jsvnEventListener.processJSVNEvent(event);
+                    // Shouldn't have any nulls, bit I just had some thrown so a check is always handy.
+					if ( jsvnEventListener != null ) {
+						jsvnEventListener.processJSVNEvent(event);
+					}
 				}
 			}
 		});

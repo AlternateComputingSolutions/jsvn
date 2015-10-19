@@ -1,7 +1,8 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Commit;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
 import javax.swing.JPanel;
 import java.util.Map;
@@ -63,7 +64,7 @@ public class CommitDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		args.put(Commit.TARGETS, getTargets());
 		String commitMessage = jTextArea1.getText();
 		if (commitMessage.length() > 0) {

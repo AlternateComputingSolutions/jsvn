@@ -1,12 +1,12 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 
 /**
  * JSVN user interface event abtracting a command's execution
  */
 public class JSVNCommandEvent implements JSVNUIEvent {
-	private Command _command;
+	private Commandable _command;
 	private String _error;
 	private String _result;
 
@@ -14,7 +14,7 @@ public class JSVNCommandEvent implements JSVNUIEvent {
 	 * returns the command related to this event
 	 * @return command
 	 */
-	public Command getCommand() {
+	public Commandable getCommand() {
 		return _command;
 	}
 
@@ -22,7 +22,7 @@ public class JSVNCommandEvent implements JSVNUIEvent {
 	 * sets the command that this event is associated with
 	 * @param command originating command
 	 */
-	public void setCommand(Command command) {
+	public void setCommand(Commandable command) {
 		_command = command;
 	}
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Build file for JSVN application
---><project basedir="." default="dist" name="jsvn">
+<!-- Build file for JSVN application -->
+
+<project basedir="." default="dist" name="jsvn">
 
 <!-- TODO: define a task that generates a .jar with only ant related classes -->
 
@@ -12,7 +12,7 @@ Build file for JSVN application
       <tstamp/>
 
       <property name="name" value="jsvn"/>
-      <property name="build.version" value="0.7"/>
+      <property name="build.version" value="0.8"/>
       <property name="classes.dir" value="classes/"/>
       <property name="doc.dir" value="docs/"/>
       <property name="etc.dir" value="etc/"/>
@@ -48,17 +48,19 @@ Build file for JSVN application
    <!-- create working directory trees -->
    <target depends="init" name="prepare">
       <mkdir dir="${classes.dir}"/>
-      <mkdir dir="${classes.dir}/META-INF"/>
+      <mkdir dir="${classes.dir}/src"/>
+      <mkdir dir="${classes.dir}/src/META-INF"/>
+      <mkdir dir="${classes.dir}/tests"/>
       <mkdir dir="${dist.dir}"/>
       <mkdir dir="${javadoc.dir}"/>
    </target>
 
     <!-- Compile the JUnit tests -->
 	<target name="generate-tests" depends="dist">
-	<mkdir dir="${classes.dir}/testcases"/>
-		<javac srcdir="test/src/" destdir="${classes.dir}/testcases">
+	<mkdir dir="${classes.dir}/tests"/>
+		<javac srcdir="test/src/" destdir="${classes.dir}/tests">
             <classpath>
-	        	<path refid="libs" />
+	        <path refid="libs" />
                 <pathelement location="${dist.dir}/${finaljarfile.name}" />
             </classpath>
             <include name="**/*.java"/>
@@ -67,15 +69,20 @@ Build file for JSVN application
 
      <!-- Run the JUnit tests IF junit.jar was found on the classpath -->
      <target name="test" depends="generate-tests">
+	<!-- copy test data needed by tests -->
+	<copy todir="${classes.dir}/tests">
+		<fileset dir="test/data/"/>
+	</copy>
+
 	<java fork="yes" classname="junit.textui.TestRunner"
             taskname="junit" failonerror="true">
             <arg value="${test.class.name}"/>
             <classpath>
-	        	<pathelement location="${lib.dir}/openapi.jar"/>
-				<pathelement location="${lib.dir}/junit.jar"/>
-				<pathelement location="${dist.dir}/${finaljarfile.name}" />
-				<pathelement location="${classes.dir}/testcases" />
-				<pathelement path="${java.class.path}" />
+	        <pathelement location="${lib.dir}/openapi.jar"/>
+			<pathelement location="${lib.dir}/junit.jar"/>
+			<pathelement location="${dist.dir}/${finaljarfile.name}" />
+			<pathelement location="${classes.dir}/tests" />
+			<pathelement path="${java.class.path}" />
             </classpath>
         </java>
     </target>
@@ -89,13 +96,13 @@ Build file for JSVN application
 	<target depends="prepare, generate-main-classes, generate-idea-classes" name="generate-all-classes"/>
 
     <target depends="prepare" name="generate-idea-classes" if="ideaAvail">
-		<javac debug="on" destdir="${classes.dir}" srcdir="${src.dir}" classpathref="libs">
+		<javac debug="on" destdir="${classes.dir}/src" srcdir="${src.dir}" classpathref="libs">
 			<include name="com/alternatecomputing/jsvn/idea/**"/>
         </javac>
     </target>
 
 	<target depends="prepare" name="generate-main-classes">
-        <javac debug="on" destdir="${classes.dir}" srcdir="${src.dir}" classpathref="libs" >
+        <javac debug="on" destdir="${classes.dir}/src" srcdir="${src.dir}" classpathref="libs" >
 			<exclude name="com/alternatecomputing/jsvn/idea/**"/>
         </javac>
     </target>
@@ -104,16 +111,20 @@ Build file for JSVN application
     <target depends="generate-all-classes" name="dist">
 
         <!--this task copies the ant task definition file to the root of the jar file, for ease of use within ant -->
-        <copy file="${etc.dir}/taskdef.properties" todir="${classes.dir}" />
-        <copy file="${etc.dir}/plugin.xml" todir="${classes.dir}/META-INF"/>
-        <copy file="${src.dir}/com/alternatecomputing/jsvn/gui/resources/jsvn_logo.png" todir="${classes.dir}/com/alternatecomputing/jsvn/gui/resources/" />
+        <copy file="${etc.dir}/taskdef.properties" todir="${classes.dir}/src" />
+        <copy file="${etc.dir}/plugin.xml" todir="${classes.dir}/src/META-INF"/>
+        <copy file="${src.dir}/com/alternatecomputing/jsvn/gui/resources/jsvn_logo.png" todir="${classes.dir}/src/com/alternatecomputing/jsvn/gui/resources/" />
 
-        <jar basedir="${classes.dir}" jarfile="${dist.dir}/${finaljarfile.name}">
+        <jar basedir="${classes.dir}/src" jarfile="${dist.dir}/${finaljarfile.name}">
             <manifest>
                 <attribute name="Main-Class" value="${main.class}"/>
             </manifest>
         </jar>
     </target>
+
+	<target depends="dist" name="deploy-plugin" if="ideaAvail">
+		<copy file="${dist.dir}/${finaljarfile.name}" tofile="${idea.dir}/plugins/${finaljarfile.name}"/>
+	</target>
 
     <!-- create the jsvn.jar file consisting of the classes and META-INF -->
     <target depends="prepare" name="generate-src-tar">

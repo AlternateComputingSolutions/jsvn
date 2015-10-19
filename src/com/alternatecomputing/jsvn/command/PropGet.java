@@ -12,12 +12,13 @@ import java.util.Map;
  */
 public class PropGet extends Command {
 	private static final String COMMAND = "svn propget {0} {1}";
-	
+
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String TARGETS = "TARGETS";
-	
+
 	public void init(Map args) throws CommandException {
-		
+		super.init(args);
+
 		Boolean nonRecursive = (Boolean) args.get(NONRECURSIVE);
 		String nonRecursiveOption;
 		if (Boolean.TRUE == nonRecursive) {
@@ -30,7 +31,7 @@ public class PropGet extends Command {
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");
 		}
-	
+
 		setCommand(MessageFormat.format(COMMAND, new String[]{targets, nonRecursiveOption}));
 	}
 }

@@ -1,7 +1,8 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Status;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
 import javax.swing.JPanel;
 import java.util.Map;
@@ -95,7 +96,7 @@ public class StatusDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		args.put(Status.TARGETS, getTargets());
 		if (jCheckBox1.isSelected()) {
 			args.put(Status.SHOW_UPDATES, Boolean.TRUE);

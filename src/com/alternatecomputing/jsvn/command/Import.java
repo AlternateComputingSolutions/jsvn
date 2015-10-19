@@ -23,7 +23,7 @@ import java.util.Map;
  *	  -r [--revision] arg      : specify revision number ARG (or X:Y range)
  *	  --message-encoding arg   : take log message in charset encoding ARG
  */
-public class Import extends Command {
+public class Import extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn import --message {0} {1} {2} {3}";
 	public static final String COMMIT_MESSAGE = "COMMIT_MESSAGE";
 	public static final String NEW_ENTRY_IN_REPOS = "NEW_ENTRY_IN_REPOS";
@@ -31,6 +31,8 @@ public class Import extends Command {
 	public static final String REPOS_URL = "REPOS_URL";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String url = (String) args.get(REPOS_URL);
 		if (url == null || "".equals(url.trim())) {
 			throw new CommandException("Missing url");

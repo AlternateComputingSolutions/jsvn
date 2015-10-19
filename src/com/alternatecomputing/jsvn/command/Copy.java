@@ -29,13 +29,15 @@ import java.text.MessageFormat;
  *   --non-interactive        : do no interactive prompting
  *   --encoding arg           : treat value as being in charset encoding ARG
  */
-public class Copy extends Command {
+public class Copy extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn copy {0} {1} {2} " + Command.NON_INTERACTIVE_MODIFIER;	// revision, source, destination
 	public static final String SOURCE = "SOURCE";
 	public static final String DESTINATION = "DESTINATION";
 	public static final String REVISION = "REVISION";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String source = (String) args.get(SOURCE);
 		if (source == null || "".equals(source.trim())) {
 			throw new CommandException("Missing source");

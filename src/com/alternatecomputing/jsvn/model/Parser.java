@@ -1,6 +1,7 @@
 package com.alternatecomputing.jsvn.model;
 
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
+import com.alternatecomputing.jsvn.Constants;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,6 +10,8 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
+import java.util.Comparator;
 
 /**
  * This parser takes the output from an svn status command and returns the root node of a hierarchy of SVNTreeNodeData
@@ -21,7 +24,8 @@ public class Parser {
 	private static final int WITH_HISTORY_POS = 3;
 	private static final int SWITCHED_POS = 4;
 	private static final int OUTDATED_POS = 7;
-	private static final String HEAD_REVISION_PREFIX = "Head revision";
+	private static final String HEAD_REVISION_PREFIX = "Head revision";	// no longer returned in current svn, but still chcekced (for now) for backwards compatibility
+	private static final String STATUS_AGAINST_REVISION_PREFIX = "Status against revision";
 
 	/**
 	 * parses the output of a svn status command and returns the root of a JTree that represents the working copy
@@ -31,17 +35,18 @@ public class Parser {
 	 */
 	public static SVNTreeNodeData parse(String result) throws IOException {
 		Map nodeCache = new HashMap();
-		BufferedReader reader = new BufferedReader(new StringReader(result));
 		String item;
 		File localItem;
 		SVNTreeNodeData root = null;
 		SVNTreeNodeData parent;
 		String wkdirpath = new File(ConfigurationManager.getInstance().getWorkingDirectory()).getCanonicalPath();
-
+        String[] sortedEntries = sortByFileName(result);
 		// loop through the command output
-		while ((item = reader.readLine()) != null) {
-			// when using "svn status -u", the last line doesn't contain any file info, just the revision number, so don't parse it.
-			if (!item.startsWith(HEAD_REVISION_PREFIX)) {
+		for (int i = 0; i < sortedEntries.length; i++) {
+			item = sortedEntries[i];
+			// when using "svn status -u", the last line doesn't contain any file info,
+			// just the revision number compared against, so don't parse it.
+			if (!item.startsWith(HEAD_REVISION_PREFIX) && !item.startsWith(STATUS_AGAINST_REVISION_PREFIX)) {
 				// pick out the first few pieces of info from the status
 				String fileStatus = item.substring(FILE_STATUS_POS, FILE_STATUS_POS + 1);
 				String propertyStatus = item.substring(PROPERTY_STATUS_POS, PROPERTY_STATUS_POS + 1);
@@ -60,7 +65,7 @@ public class Parser {
 				handleFileStatus(fileStatus, nodeData);
 				if (fileStatus.equals("?")) {
 					localItem = new File(item.trim());
-					nodeData.setPath(localItem.getCanonicalPath().substring(wkdirpath.length()));
+					nodeData.setPath(getPathRelativeToWorkingCopy(localItem, wkdirpath));
 					nodeData.setName(localItem.getName());
 
 					// item is not under revision control
@@ -84,7 +89,7 @@ public class Parser {
 					// handle outdated indicator
 					handleOutDatedIndicator(outdatedIndicator, nodeData);
 
-					StringTokenizer st = new StringTokenizer(item, " ");
+					StringTokenizer st = new StringTokenizer(item, Constants.SPACE);
 
 					// parse working revision
 					String token = st.nextToken();
@@ -106,13 +111,23 @@ public class Parser {
 						nodeData.setLastChangedRevision(Integer.parseInt(token));
 					}
 
-					// parse last change author
-					nodeData.setLastChangedAuthor(st.nextToken());
+					// parse next field
+					token = st.nextToken();
+					if (st.hasMoreTokens()) {
+						// we just parsed the last changed author
+						nodeData.setLastChangedAuthor(token);
 
-					String fileName = st.nextToken("");
-					localItem = new File(fileName.trim());
-					nodeData.setPath(localItem.getCanonicalPath().substring(wkdirpath.length()));
-					nodeData.setName(localItem.getName());
+						// next field is the filename
+						String fileName = st.nextToken("");
+						localItem = new File(fileName.trim());
+						nodeData.setPath(getPathRelativeToWorkingCopy(localItem, wkdirpath));
+						nodeData.setName(localItem.getName());
+					} else {
+						// the token is the filename
+						localItem = new File(token.trim());
+						nodeData.setPath(getPathRelativeToWorkingCopy(localItem, wkdirpath));
+						nodeData.setName(localItem.getName());
+					}
 				}
 
 				// determine if it's a file or directory
@@ -125,12 +140,10 @@ public class Parser {
 				// look in cache for parent to link this node to
 				parent = (SVNTreeNodeData) nodeCache.get(localItem.getParentFile());
 				if (parent == null) {
-
 					// no root exists yet so this node must be the tree root
 					parent = nodeData;
 					root = nodeData;
 				} else {
-
 					// add the new node to the parent
 					parent.getChildren().add(nodeData);
 				}
@@ -140,6 +153,33 @@ public class Parser {
 			}
 		}
 		return root;
+	}
+
+	/**
+	 * returns an array of "svn status" entries, sorted by filename
+	 * @param statusOutput the output of a "svn status" command
+	 * @return array of status entries, sorted by filename
+	 */
+	private static String[] sortByFileName(String statusOutput) throws IOException {
+		Comparator comparator = new FileNameComparator();
+        TreeSet sortedSet = new TreeSet(comparator);
+		BufferedReader reader = new BufferedReader(new StringReader(statusOutput));
+		String item;
+		while ((item = reader.readLine()) != null) {
+			sortedSet.add(item);
+		}
+		return (String[]) sortedSet.toArray(new String[0]);
+	}
+
+	/**
+	 * returns the path of the given file relative to the working copy
+	 * @param localItem given file
+	 * @param wkdirpath location of working copy
+	 * @return relative path
+	 * @throws IOException if errors occur accessing the localItem
+	 */
+	private static String getPathRelativeToWorkingCopy(File localItem, String wkdirpath) throws IOException {
+		return localItem.getCanonicalPath().substring(wkdirpath.length() + 1);
 	}
 
 	/**
@@ -267,6 +307,18 @@ public class Parser {
 		} else {
 			// XXX - log error
 		}
+	}
+
+	/**
+	 * comparator class to compare entries from an svn status command based on their filename
+	 */
+	private static class FileNameComparator implements Comparator {
+		public int compare(Object o1, Object o2) {
+			String s1 = ((String) o1).substring(((String) o1).lastIndexOf(" ") +1);
+			String s2 = ((String) o2).substring(((String) o2).lastIndexOf(" ") +1);
+			return s1.compareTo(s2);
+		}
+
 	}
 }
 

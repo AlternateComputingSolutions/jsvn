@@ -1,9 +1,9 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Diff;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
 import java.util.Map;
@@ -46,6 +46,10 @@ public class DiffDialog extends CommandDialog {
         jCheckBox1 = new javax.swing.JCheckBox();
         jCheckBox2 = new javax.swing.JCheckBox();
         jCheckBox3 = new javax.swing.JCheckBox();
+        jCheckBox4 = new javax.swing.JCheckBox();
+        jCheckBox5 = new javax.swing.JCheckBox();
+        jCheckBox6 = new javax.swing.JCheckBox();
+        jCheckBox7 = new javax.swing.JCheckBox();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -55,7 +59,7 @@ public class DiffDialog extends CommandDialog {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(475, 255));
+        jPanel1.setPreferredSize(new java.awt.Dimension(475, 355));
         jRadioButton1.setSelected(true);
         jRadioButton1.setText("Revision:");
         buttonGroup1.add(jRadioButton1);
@@ -91,8 +95,9 @@ public class DiffDialog extends CommandDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 248;
+        gridBagConstraints.ipadx = 276;
         gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 37);
         jPanel1.add(jTextField1, gridBagConstraints);
@@ -100,6 +105,7 @@ public class DiffDialog extends CommandDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
         gridBagConstraints.weightx = 1.0;
@@ -109,41 +115,45 @@ public class DiffDialog extends CommandDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(27, 10, 1, 37);
+        gridBagConstraints.weightx = 1.0;
         jPanel1.add(jTextField3, gridBagConstraints);
 
         jLabel1.setText("specify revision number ARG (or X:Y range)");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 13;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(1, 10, 38, 37);
+        gridBagConstraints.weightx = 1.0;
         jPanel1.add(jLabel1, gridBagConstraints);
 
         jLabel2.setText("specify a date ARG (instead of a revision)");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.gridheight = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 24;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(51, 10, 35, 37);
+        gridBagConstraints.weightx = 1.0;
         jPanel1.add(jLabel2, gridBagConstraints);
 
         jLabel3.setText("passed as bundled options to GNU diff");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 3;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 37;
-        gridBagConstraints.weightx = 1.0;
         gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 37);
+        gridBagConstraints.weightx = 1.0;
         jPanel1.add(jLabel3, gridBagConstraints);
 
         jLabel4.setText("Extensions:");
@@ -158,21 +168,18 @@ public class DiffDialog extends CommandDialog {
         jCheckBox1.setText("Non-recursive");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 7;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 36;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(17, 20, 24, 297);
+        gridBagConstraints.insets = new java.awt.Insets(17, 20, 23, 210);
         jPanel1.add(jCheckBox1, gridBagConstraints);
 
         jCheckBox2.setText("Ignore Blank Lines");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 4;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 9;
-        gridBagConstraints.insets = new java.awt.Insets(25, 70, 0, 107);
+        gridBagConstraints.ipadx = 29;
+        gridBagConstraints.insets = new java.awt.Insets(25, 70, 0, 0);
         jPanel1.add(jCheckBox2, gridBagConstraints);
 
         jCheckBox3.setText("Ignore Whitespace");
@@ -180,10 +187,42 @@ public class DiffDialog extends CommandDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.gridwidth = 2;
-        gridBagConstraints.ipadx = 11;
-        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(25, 20, 0, 297);
+        gridBagConstraints.ipadx = 31;
+        gridBagConstraints.insets = new java.awt.Insets(25, 20, 0, 190);
         jPanel1.add(jCheckBox3, gridBagConstraints);
+
+        jCheckBox4.setText("Ignore Case");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.ipadx = 71;
+        gridBagConstraints.insets = new java.awt.Insets(17, 20, 0, 190);
+        jPanel1.add(jCheckBox4, gridBagConstraints);
+
+        jCheckBox5.setText("Context Output Format");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.insets = new java.awt.Insets(17, 20, 0, 190);
+        jPanel1.add(jCheckBox5, gridBagConstraints);
+
+        jCheckBox6.setText("Ignore Space Changes");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.ipadx = 8;
+        gridBagConstraints.insets = new java.awt.Insets(17, 70, 0, 0);
+        jPanel1.add(jCheckBox6, gridBagConstraints);
+
+        jCheckBox7.setText("Unified Output Format");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.ipadx = 4;
+        gridBagConstraints.insets = new java.awt.Insets(17, 70, 0, 0);
+        jPanel1.add(jCheckBox7, gridBagConstraints);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -204,7 +243,7 @@ public class DiffDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		String revision = jTextField1.getText().trim();
 		if (jRadioButton1.isSelected() && revision.length() > 0) {
 			args.put(Diff.REVISION, revision);
@@ -214,11 +253,23 @@ public class DiffDialog extends CommandDialog {
 			args.put(Diff.REVISION, "{" + date + "}");
 		}
 		String extensions = jTextField3.getText().trim();
+		if (jCheckBox2.isSelected()) {
+			extensions += "B";
+		}
 		if (jCheckBox3.isSelected()) {
 			extensions += "w";
 		}
-		if (jCheckBox2.isSelected()) {
-			extensions += "B";
+		if (jCheckBox4.isSelected()) {
+			extensions += "i";
+		}
+		if (jCheckBox5.isSelected()) {
+			extensions += "c";
+		}
+		if (jCheckBox6.isSelected()) {
+			extensions += "b";
+		}
+		if (jCheckBox7.isSelected()) {
+			extensions += "u";
 		}
 		if (extensions.length() > 0) {
 			if (!extensions.startsWith("-")) {
@@ -289,6 +340,10 @@ public class DiffDialog extends CommandDialog {
     private javax.swing.JTextField jTextField3;
     private javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JCheckBox jCheckBox6;
+    private javax.swing.JCheckBox jCheckBox7;
+    private javax.swing.JCheckBox jCheckBox5;
+    private javax.swing.JCheckBox jCheckBox4;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;

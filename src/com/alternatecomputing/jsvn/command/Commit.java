@@ -26,12 +26,14 @@ import java.util.Map;
  *   --non-interactive        : do no interactive prompting
  *   --encoding arg           : treat value as being in charset encoding ARG
  */
-public class Commit extends Command {
+public class Commit extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn commit --file {0} {1} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String COMMIT_MESSAGE = "COMMIT_MESSAGE";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String targets = (String) args.get(TARGETS);
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");

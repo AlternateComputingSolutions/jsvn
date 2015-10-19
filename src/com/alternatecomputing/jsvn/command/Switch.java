@@ -23,7 +23,7 @@ import java.text.MessageFormat;
  *   --no-auth-cache          : do not cache authentication tokens
  *   --non-interactive        : do no interactive prompting
  */
-public class Switch extends Command {
+public class Switch extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn switch {0} {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, non-recursive, url, path
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String REVISION = "REVISION";
@@ -31,6 +31,8 @@ public class Switch extends Command {
 	public static final String PATH = "PATH";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String url = (String) args.get(URL);
 		if (url == null || "".equals(url.trim())) {
 			throw new CommandException("Missing URL");

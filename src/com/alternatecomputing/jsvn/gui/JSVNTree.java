@@ -1,8 +1,9 @@
 package com.alternatecomputing.jsvn.gui;
 
+import com.alternatecomputing.jsvn.Constants;
 import com.alternatecomputing.jsvn.command.Add;
 import com.alternatecomputing.jsvn.command.Cleanup;
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Delete;
 import com.alternatecomputing.jsvn.command.Info;
 import com.alternatecomputing.jsvn.command.Resolve;
@@ -10,7 +11,6 @@ import com.alternatecomputing.jsvn.command.Revert;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import com.alternatecomputing.jsvn.model.SVNTreeModel;
 import com.alternatecomputing.jsvn.model.SVNTreeNodeData;
-import com.alternatecomputing.jsvn.Constants;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -304,10 +304,10 @@ public class JSVNTree extends JTree implements ActionListener {
 		} else {
 			if (ae.getActionCommand().equals(ACTION_ADD)) {
 				// process add request
-				Command command = new Add();
+				Commandable command = new Add();
 				Map args = new HashMap();
 				args.put(Add.TARGETS, targets);
-				executeDirectCommand(command, args);
+				executeCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_CAT)) {
 				// process cat request
 				CommandDialog dialog = new CatDialog(Application.getApplicationFrame(), true);
@@ -329,10 +329,10 @@ public class JSVNTree extends JTree implements ActionListener {
 					}
 				}
 				// process cleanup request
-				Command command = new Cleanup();
+				Commandable command = new Cleanup();
 				Map args = new HashMap();
 				args.put(Cleanup.TARGETS, targets);
-				executeDirectCommand(command, args);
+				executeCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_COMMIT)) {
 				// process commit request
 				CommandDialog dialog = new CommitDialog(Application.getApplicationFrame(), true);
@@ -343,20 +343,20 @@ public class JSVNTree extends JTree implements ActionListener {
 				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_DELETE)) {
 				// process delete request
-				Command command = new Delete();
+				Commandable command = new Delete();
 				Map args = new HashMap();
 				args.put(Delete.TARGETS, targets);
-				executeDirectCommand(command, args);
+				executeCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_DIFF)) {
 				// process diff request
 				CommandDialog dialog = new DiffDialog(Application.getApplicationFrame(), true);
 				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_INFO)) {
 				// process info request
-				Command command = new Info();
+				Commandable command = new Info();
 				Map args = new HashMap();
 				args.put(Info.TARGETS, targets);
-				executeDirectCommand(command, args);
+				executeCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_LOG)) {
 				// process log request
 				CommandDialog dialog = new LogDialog(Application.getApplicationFrame(), true);
@@ -381,15 +381,15 @@ public class JSVNTree extends JTree implements ActionListener {
 				String[] targetArray = getSelectedTargetsAsArray();
 				for (int i = 0; i < targetArray.length; i++) {
 					String s = targetArray[i];
-					message += s + Constants.NEWLINE_CHARACTER;
+					message += s + Constants.NEWLINE;
 				}
 				int confirmation = JOptionPane.showConfirmDialog(this, message, CONFIRMATION, JOptionPane.OK_CANCEL_OPTION);
 				if (confirmation == JOptionPane.OK_OPTION) {
 					// process add request
-					Command command = new Resolve();
+					Commandable command = new Resolve();
 					Map args = new HashMap();
 					args.put(Resolve.TARGETS, targets);
-					executeDirectCommand(command, args);
+					executeCommand(command, args);
 				}
 			} else if (ae.getActionCommand().equals(ACTION_REVERT)) {
 				// process revert request
@@ -397,15 +397,15 @@ public class JSVNTree extends JTree implements ActionListener {
 				String[] targetArray = getSelectedTargetsAsArray();
 				for (int i = 0; i < targetArray.length; i++) {
 					String s = targetArray[i];
-					message += s + Constants.NEWLINE_CHARACTER;
+					message += s + Constants.NEWLINE;
 				}
 				int confirmation = JOptionPane.showConfirmDialog(this, message, CONFIRMATION, JOptionPane.OK_CANCEL_OPTION);
 				if (confirmation == JOptionPane.OK_OPTION) {
 					// process add request
-					Command command = new Revert();
+					Commandable command = new Revert();
 					Map args = new HashMap();
 					args.put(Revert.TARGETS, targets);
-					executeDirectCommand(command, args);
+					executeCommand(command, args);
 				}
 			} else if (ae.getActionCommand().equals(ACTION_STATUS)) {
 				// process status request
@@ -424,7 +424,7 @@ public class JSVNTree extends JTree implements ActionListener {
 	}
 
 	/**
-	 * initialized a dialog and makes it visible
+	 * initializes a dialog and makes it visible
 	 * @param dialog CommandDialog to be initialized and shown
 	 * @param targets targets for the command
 	 */
@@ -438,7 +438,7 @@ public class JSVNTree extends JTree implements ActionListener {
 	 * @param command command to be run
 	 * @param args parameters to configure the command correctly
 	 */
-	private void executeDirectCommand(Command command, Map args) {
+	private void executeCommand(Commandable command, Map args) {
 		JSVNCommandExecutor executor = new JSVNCommandExecutor(command, args);
 		executor.addJSVNEventListener(Application.getApplicationFrame());
 

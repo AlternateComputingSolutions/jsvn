@@ -10,8 +10,10 @@ import java.util.Map;
  *	  -q [--quiet]             : print as little as possible
  *	  -R [--recursive]         : descend recursively
  */
-public class PropDel extends Command {
+public class PropDel extends Command implements WorkingCopyModifiable {
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 	}
 }

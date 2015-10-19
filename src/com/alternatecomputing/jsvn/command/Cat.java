@@ -23,6 +23,8 @@ public class Cat extends Command {
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String targets = (String) args.get(TARGETS);
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");

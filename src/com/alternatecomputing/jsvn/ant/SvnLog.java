@@ -10,6 +10,7 @@ import org.apache.tools.ant.BuildException;
 import com.alternatecomputing.jsvn.command.Command;
 import com.alternatecomputing.jsvn.command.CommandException;
 import com.alternatecomputing.jsvn.command.Log;
+import com.alternatecomputing.jsvn.command.Commandable;
 
 public class SvnLog extends AbstractSvnTask {
 
@@ -18,28 +19,28 @@ public class SvnLog extends AbstractSvnTask {
 	private String revision = "";
 	private String target;
 
-	Command buildCommand() throws CommandException {
+	Commandable buildCommand() throws CommandException {
 		Map args = new HashMap();
 		args.put(Log.QUIET, new Boolean(quiet));
 		args.put(Log.VERBOSE, new Boolean(verbose));
 		args.put(Log.REVISION, revision);
 		args.put(Log.TARGETS, target);
 
-		Command command = new Log();	
-		command.init(args);	
-		
-		return command;			
+		Command command = new Log();
+		command.init(args);
+
+		return command;
 	}
 
 	public void setRevision(String string) {
 		revision = string;
 	}
 
-	
-	public void setTarget(File file) {		
+
+	public void setTarget(File file) {
 		try {
 			target = file.getCanonicalPath();
-		} catch (IOException e) {				
+		} catch (IOException e) {
 			throw new BuildException(e);
 		}
 	}

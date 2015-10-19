@@ -1,6 +1,6 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Move;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
@@ -80,6 +80,7 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.ipadx = 33;
         gridBagConstraints.ipady = 5;
         gridBagConstraints.insets = new java.awt.Insets(20, 60, 50, 0);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanel1.add(jLabel1, gridBagConstraints);
 
         jLabel2.setText("Destination:");
@@ -89,6 +90,7 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.ipadx = 1;
         gridBagConstraints.ipady = 5;
         gridBagConstraints.insets = new java.awt.Insets(31, 60, 0, 0);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanel1.add(jLabel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -167,6 +169,7 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.ipadx = 19;
         gridBagConstraints.insets = new java.awt.Insets(30, 40, 0, 290);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanel1.add(jRadioButton1, gridBagConstraints);
 
         jRadioButton2.setText("Date:");
@@ -183,6 +186,7 @@ public class MoveDialog extends CommandDialog {
         gridBagConstraints.gridwidth = 2;
         gridBagConstraints.ipadx = 43;
         gridBagConstraints.insets = new java.awt.Insets(27, 40, 26, 290);
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         jPanel1.add(jRadioButton2, gridBagConstraints);
 
         jLabel3.setText("specify a date ARG (instead of a revision)");
@@ -272,7 +276,7 @@ public class MoveDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		args.put(Move.SOURCE, jTextField1.getText().trim());
 		args.put(Move.DESTINATION, jTextField2.getText().trim());
 		String revision = jTextField3.getText().trim();

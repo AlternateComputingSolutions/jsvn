@@ -15,11 +15,13 @@ import java.util.Map;
  *	  -R [--recursive]         : descend recursively
  *    -q [--quiet]             : print as little as possible
  */
-public class Revert extends Command {
+public class Revert extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn revert {0}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String targets = (String) args.get(TARGETS);
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");

@@ -8,11 +8,13 @@ import java.text.MessageFormat;
  * unfinished operations, etc.
  * usage: cleanup [PATH [PATH ... ]]
  */
-public class Cleanup extends Command {
+public class Cleanup extends Command implements WorkingCopyModifiable {
 	private static final String COMMAND = "svn cleanup {0}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
+		super.init(args);
+
 		String targets = (String) args.get(TARGETS);
 		if (targets == null || "".equals(targets.trim())) {
 			throw new CommandException("Missing target(s)");

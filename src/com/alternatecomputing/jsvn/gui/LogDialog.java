@@ -1,7 +1,8 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Log;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
 import javax.swing.JPanel;
 import java.awt.event.ActionEvent;
@@ -157,7 +158,7 @@ public class LogDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		String revision = jTextField1.getText().trim();
 		if (jRadioButton1.isSelected() && revision.length() > 0) {
 			args.put(Log.REVISION, revision);

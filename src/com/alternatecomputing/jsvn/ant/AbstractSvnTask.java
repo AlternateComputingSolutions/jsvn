@@ -1,15 +1,13 @@
 package com.alternatecomputing.jsvn.ant;
 
-import java.io.File;
-import java.io.IOException;
-
+import com.alternatecomputing.jsvn.command.Command;
+import com.alternatecomputing.jsvn.command.CommandException;
+import com.alternatecomputing.jsvn.command.Commandable;
+import com.alternatecomputing.jsvn.configuration.Configuration;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-
-import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.command.CommandException;
-import com.alternatecomputing.jsvn.configuration.*;
 
 public abstract class AbstractSvnTask extends Task {
 
@@ -22,14 +20,14 @@ public abstract class AbstractSvnTask extends Task {
 	}
 
 	/** return a customized JSVN Command object */
-	abstract Command buildCommand() throws CommandException;
+	abstract Commandable buildCommand() throws CommandException;
 
 	public void execute() throws BuildException {
 		Configuration backupConfig = ConfigurationManager.getInstance().getConfig();
 
 		try{
 			ConfigurationManager.getInstance().setConfig(getConfiguration());
-			Command command = buildCommand();
+			Commandable command = buildCommand();
 			command.execute();
 		} catch (CommandException e) {
 			if (failOnError){

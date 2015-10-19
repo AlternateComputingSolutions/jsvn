@@ -1,28 +1,22 @@
 package com.alternatecomputing.jsvn.idea;
 
+import com.alternatecomputing.jsvn.command.CommandException;
+import com.alternatecomputing.jsvn.command.Commandable;
+import com.alternatecomputing.jsvn.gui.Frame;
 import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.wm.ToolWindow;
-import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.openapi.wm.ToolWindowAnchor;
 import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.openapi.wm.ToolWindowAnchor;
+import com.intellij.openapi.wm.ToolWindowManager;
 
-import javax.swing.*;
-import javax.swing.tree.DefaultTreeModel;
-
-import com.alternatecomputing.jsvn.gui.Frame;
-import com.alternatecomputing.jsvn.gui.JSVNTree;
-import com.alternatecomputing.jsvn.model.SVNTreeModel;
-import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
-import com.alternatecomputing.jsvn.command.Executable;
-import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.command.CommandException;
-
-import java.awt.*;
+import javax.swing.JPanel;
 import java.util.Map;
 
-public class JsvnComponent implements ProjectComponent, Executable {
+/**
+ *
+ */
+public class JsvnComponent implements ProjectComponent {
 
 	public static final String TOOL_WINDOW_ID = "Subversion";
 
@@ -69,7 +63,7 @@ public class JsvnComponent implements ProjectComponent, Executable {
 		//
 	}
 
-    public void executeCommand(Command command, Map args) throws CommandException {
+    public void executeCommand(Commandable command, Map args) throws CommandException {
         //
     }
 

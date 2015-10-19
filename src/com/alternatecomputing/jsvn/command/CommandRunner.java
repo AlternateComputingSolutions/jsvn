@@ -1,6 +1,6 @@
 package com.alternatecomputing.jsvn.command;
 
-import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
+import com.alternatecomputing.jsvn.Constants;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,22 +33,22 @@ public class CommandRunner {
 
 	/**
 	 * runs the given command
+	 * @param workingCopy location of working copy
 	 * @param command subversion command to run
 	 */
-	public synchronized void runCommand(String command) throws CommandException {
+	public synchronized void runCommand(String workingCopy, String command) throws CommandException {
 		Runtime rt = Runtime.getRuntime();
 		try {
 
 			// execute the command
-			String workingCopy = ConfigurationManager.getInstance().getWorkingCopy();
 			File dir;
 			if (workingCopy != null) {
 				dir = new File(workingCopy);
 				if (!dir.exists()) {
-					dir = new File(System.getProperty("user.home"));
+					dir = new File(System.getProperty(Constants.USER_HOME));
 				}
 			} else {
-				dir = new File(System.getProperty("user.home"));
+				dir = new File(System.getProperty(Constants.USER_HOME));
 			}
 			Process proc = rt.exec(command, null, dir);
 

@@ -1,8 +1,9 @@
 package com.alternatecomputing.jsvn.gui;
 
-import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.command.Update;
+import com.alternatecomputing.jsvn.command.Commandable;
 import com.alternatecomputing.jsvn.command.Switch;
+import com.alternatecomputing.jsvn.command.Update;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -187,7 +188,7 @@ public class SwitchDialog extends CommandDialog {
      * @param args map of arguments to be passed into the returned command
      * @return implementation of Command to execute with the given configured args
      */
-    protected Command buildCommand(Map args) {
+    protected Commandable buildCommand(Map args) {
 		args.put(Switch.URL, jTextField1.getText().trim());
 		String revision = jTextField2.getText().trim();
 		if (jRadioButton1.isSelected() && revision.length() > 0) {

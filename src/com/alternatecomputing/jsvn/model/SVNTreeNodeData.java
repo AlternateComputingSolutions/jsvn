@@ -32,6 +32,8 @@ public class SVNTreeNodeData {
 	public static final int PROPERTY_STATUS_MODIFIED = 1;
 	public static final int PROPERTY_STATUS_CONFLICT = 2;
 
+	public static final String UNKNOWN_LAST_CHANGED_AUTHOR = "";
+
 	private String _path;
 	private String _name;
 	private int _revision = NOT_VERSIONED;
@@ -42,7 +44,7 @@ public class SVNTreeNodeData {
 	private boolean _isLocked = false;
 	private boolean _isSwitched = false;
 	private boolean _isOutDated = false;
-	private String _lastChangedAuthor;
+	private String _lastChangedAuthor = UNKNOWN_LAST_CHANGED_AUTHOR;
 	private int _lastChangedRevision = NOT_VERSIONED;
 
 	private SVNTreeNodeData _parent;
@@ -276,35 +278,46 @@ public class SVNTreeNodeData {
 	}
 
 	public String toString() {
-		String result = getName();
+		String statusText = getStatusText();
+		if (statusText.length() > 0) {
+			return getName() + "  [" + statusText + "]";
+		} else {
+			return getName();
+		}
+	}
+
+	/**
+	 * returns the textual representation of the given node's status
+	 * @return node's status text
+	 */
+	public String getStatusText() {
+		StringBuffer result = new StringBuffer();
 		switch (_fileStatus) {
 			case FILE_STATUS_NOT_VERSIONED:
-				result += "  [not versioned]";
-				return result;
+				result.append("not versioned");
+				return result.toString();
 			case FILE_STATUS_NO_CHANGES:
 				if (!_isOutDated) {
-					result += "  [up-to-date";
-				} else {
-					result += "  [";
+					result.append("up-to-date");
+					break;
 				}
-				break;
 			case FILE_STATUS_ADDITION_SCHEDULED:
-				result += "  [addition scheduled";
+				result.append("addition scheduled");
 				break;
 			case FILE_STATUS_DELETION_SCHEDULED:
-				result += "  [deletion scheduled";
+				result.append("deletion scheduled");
 				break;
 			case FILE_STATUS_MODIFIED:
-				result += "  [locally modified";
+				result.append("locally modified");
 				break;
 			case FILE_STATUS_CONFLICT:
-				result += "  [locally conflicted";
+				result.append("locally conflicted");
 				break;
 			case FILE_STATUS_MISSING:
-				result += "  [locally deleted";
+				result.append("locally deleted");
 				break;
 			case FILE_STATUS_WRONG_TYPE:
-				result += "  [wrong type";
+				result.append("wrong type");
 				break;
 			default:
 				System.err.println("Unexpected local status: " + _fileStatus);
@@ -312,37 +325,37 @@ public class SVNTreeNodeData {
 		}
 		if (_isOutDated) {
 			if (_revision == UNKNOWN_VERSION) {
-				result += "new repository file";
+				result.append("new repository file");
 			} else if (_fileStatus == FILE_STATUS_NO_CHANGES) {
-				result += "out-of-date";
+				result.append("out-of-date");
 			} else {
-				result += ", out-of-date";
+				result.append(", out-of-date");
 			}
 		}
 		switch (_propertyStatus) {
 			case PROPERTY_STATUS_NO_CHANGE:
 				break;
 			case PROPERTY_STATUS_MODIFIED:
-				result += ", locally modified properties";
+				result.append(", locally modified properties");
 				break;
 			case PROPERTY_STATUS_CONFLICT:
-				result += ", conflicting local properties";
+				result.append(", conflicting local properties");
 				break;
 			default:
 				System.err.println("Unexpected local property status: " + _propertyStatus);
 				return "";
 		}
 		if (_isLocked) {
-			result += ", locked";
+			result.append(", locked");
 		}
 		if (_hasHistory) {
-			result += ", with history";
+			result.append(", with history");
 		}
 		if (_isSwitched) {
-			result += ", switched";
+			result.append(", switched");
 		}
-		result += "]";
-		return result;
+		return result.toString();
+
 	}
 
 	/**

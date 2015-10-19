@@ -8,7 +8,6 @@ import javax.swing.JTree;
 import javax.swing.UIManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import java.awt.Color;
 import java.awt.Component;
 import java.io.File;
 
@@ -65,29 +64,8 @@ public class JSVNTreeCellRenderer extends DefaultTreeCellRenderer {
 		}
 
 		// change the text color to reflect the file's status
-		if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_WRONG_TYPE) {
-			setForeground(Color.red);
-		} else if (data.getOutDatedIndicator()) {
-			setForeground(Color.red);
-		} else if (data.getLockedIndicator()) {
-			setForeground(Color.red);
-		} else if (data.getSwitchedIndicator()) {
-			setForeground(Color.red);
-		} else if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_CONFLICT) {
-			setForeground(Color.red);
-		} else if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_ADDITION_SCHEDULED) {
-			setForeground(Color.blue);
-		} else if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_DELETION_SCHEDULED) {
-			setForeground(Color.blue);
-		} else if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_MISSING) {
-			setForeground(Color.red);
-		} else if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_MODIFIED) {
-			setForeground(Color.blue);
-		} else if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_NOT_VERSIONED) {
-			setForeground(Color.gray);
-		}
+		setForeground(GenericCellRendererHelper.getStatusColor(data));
 
-		
 		StringBuffer tipText = new StringBuffer("<html>Path: ").append(data.getPath()).append("<br>Name: ").append(data.getName());
 		if (data.getRevision() != SVNTreeNodeData.NOT_VERSIONED && data.getRevision() != SVNTreeNodeData.UNKNOWN_VERSION) {
 			tipText.append("<br>Revision: ").append(data.getRevision());
@@ -96,7 +74,7 @@ public class JSVNTreeCellRenderer extends DefaultTreeCellRenderer {
 
 		if (data.getNodeKind() == SVNTreeNodeData.NODE_KIND_FILE) {
 			File f = new File(ConfigurationManager.getInstance().getWorkingDirectory()+data.getPath());
-			tipText.append("<br>Length: ").append(f.length()).append(" bytes");
+			tipText.append("<br>Size: ").append(f.length()).append(" bytes");
 		}
 		if (data.getLastChangedAuthor() != null) {
 			tipText.append("<br>Last Changed Author: ").append(data.getLastChangedAuthor());
@@ -104,7 +82,7 @@ public class JSVNTreeCellRenderer extends DefaultTreeCellRenderer {
 		if (data.getLastChangedRevision() != SVNTreeNodeData.NOT_VERSIONED && data.getLastChangedRevision() != SVNTreeNodeData.UNKNOWN_VERSION) {
 			tipText.append("<br>Last Changed Rev: ").append(data.getLastChangedRevision()).append("</html>");
 		}
-		
+
 		setToolTipText(tipText.toString());
 
 		return this;

@@ -22,7 +22,7 @@ import java.awt.event.WindowEvent;
 public class AboutDialog extends CenterableDialog {
 
 	private final String TITLE = "About";
-	private final String CAPTION = "Java Subversion Client\nhttp://www.alternatecomputing.com/";
+	private final String CAPTION = "Java Subversion Client\nhttp://jsvn.alternatecomputing.com/";
 	private JPanel contentPane = new JPanel();
 	private JLabel prodLabel = new JLabel();
 	private JLabel verLabel = new JLabel();
