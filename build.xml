@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Build file for JSVN application
+--><project basedir="." default="build" name="jsvn">
+
+   <!-- define some variables -->
+   <target name="init">
+      <tstamp/>
+
+      <property name="name" value="jsvn"/>
+      <property name="build.version" value="0.2"/>
+      <property name="classes.dir" value="classes/"/>
+      <property name="doc.dir" value="docs/"/>
+      <property name="javadoc.dir" value="${doc.dir}/javadoc/"/>
+      <property name="src.dir" value="src/"/>
+      <property name="lib.dir" value="lib/"/>
+      <property name="dist.dir" value="dist/"/>
+      <property name="build.compiler" value="modern"/>
+      <property name="finaljarfile.name" value="${name}-${build.version}.jar"/>
+      <property name="finaldocstarfile.name" value="${name}-docs-${build.version}.tgz"/>
+      <property name="finalsrctarfile.name" value="${name}-src-${build.version}.tgz"/>
+      <property name="main.class" value="com.alternatecomputing.jsvn.gui.Application"/>
+      <property name="test.class.name" value="com.alternatecomputing.jsvn.Suite" />
+   </target>
+
+   <!-- delete working directories -->
+   <target depends="init" name="clean">
+      <delete dir="${classes.dir}"/>
+      <delete dir="${dist.dir}"/>
+      <delete dir="${javadoc.dir}"/>
+   </target>
+
+   <!-- create working directory trees -->
+   <target depends="init" name="prepare">
+      <mkdir dir="${classes.dir}"/>
+      <mkdir dir="${dist.dir}"/>
+      <mkdir dir="${javadoc.dir}"/>
+   </target>
+
+    <!-- Compile the JUnit tests -->
+    <target name="generate-tests" depends="generate-jar">
+	<mkdir dir="${classes.dir}/testcases"/>
+        <javac srcdir="test/src/" destdir="${classes.dir}/testcases">
+            <classpath>
+	        <pathelement location="${lib.dir}/junit.jar"/>
+                <pathelement location="${dist.dir}/${finaljarfile.name}" />
+            </classpath>
+            <include name="**/*.java"/>
+        </javac>
+    </target>
+
+     <!-- Run the JUnit tests IF junit.jar was found on the classpath -->
+     <target name="test" depends="generate-tests">
+	<java fork="yes" classname="junit.textui.TestRunner"
+            taskname="junit" failonerror="true">
+            <arg value="${test.class.name}"/>
+            <classpath>
+		<pathelement location="${lib.dir}/junit.jar"/>
+                <pathelement location="${dist.dir}/${finaljarfile.name}" />
+                <pathelement location="${classes.dir}/testcases" />
+                <pathelement path="${java.class.path}" />
+            </classpath>
+        </java>
+    </target>
+
+    <!-- Run the application, compile if necessary -->
+    <target name="run" depends="generate-jar">
+	<java fork="yes" jar="${dist.dir}${finaljarfile.name}"/>
+    </target>
+
+   <!-- compile classes -->
+   <target depends="prepare" name="generate-classes">
+      <javac debug="on" destdir="${classes.dir}" extdirs="${lib.dir}" srcdir="${src.dir}"/>
+   </target>
+
+   <!-- create the jsvn.jar file consisting of the classes and META-INF -->
+   <target depends="generate-classes" name="generate-jar">
+
+   <jar basedir="${classes.dir}" jarfile="${dist.dir}/${finaljarfile.name}">
+        <manifest>
+            <attribute name="Main-Class" value="${main.class}"/>
+        </manifest>
+      </jar>
+   </target>
+
+   <!-- create the jsvn.jar file consisting of the classes and META-INF -->
+   <target depends="prepare" name="generate-src-tar">
+
+    <tar tarfile="${dist.dir}/${finalsrctarfile.name}" compression="gzip">
+        <tarfileset dir="${basedir}" includes="src/** lib/** README.txt LICENSE.txt build.xml" excludes="**/.nbattrs **/*.tgz *.sh "/>
+    </tar>
+
+   </target>
+
+   <!-- create JavaDoc for all jsvn classes -->
+   <target depends="generate-classes" name="generate-javadoc">
+     <delete dir="${javadoc.dir}"/>
+     <mkdir dir="${javadoc.dir}"/>
+     <javadoc author="true" bottom="&lt;i&gt;Copyright &amp;#169; 2002-2003 All Rights Reserved.&lt;/i&gt;" destdir="${javadoc.dir}" doctitle="&lt;h1&gt;${name} ${build.version}&lt;/h1&gt;" packagenames="com.*" private="true" sourcepath="${src.dir}" use="true" version="true" windowtitle="${name} API ${build.version}"/>
+   </target>
+
+	<!-- build everything -->
+   <target depends="generate-src-tar,generate-docs-tar,generate-jar" name="build"/>
+
+   <!-- build the javadocs jar file -->
+   <target depends="generate-javadoc" name="generate-docs-tar">
+       <tar basedir="${javadoc.dir}" compression="gzip" tarfile="${dist.dir}/${finaldocstarfile.name}"/>
+   </target>
+
+</project>
