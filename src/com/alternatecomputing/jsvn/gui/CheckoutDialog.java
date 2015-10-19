@@ -383,7 +383,8 @@ public class CheckoutDialog extends CommandDialog {
 	 *
 	 * @param success
 	 */
-	protected void postExecute(boolean success) {
+	public void postExecute(boolean success) {
+		super.postExecute(success);
 		if (success) {
 			// if checkout command ran correctly, save the new config settings
 			ConfigurationManager.getInstance().saveConfig();

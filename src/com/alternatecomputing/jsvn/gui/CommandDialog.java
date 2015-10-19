@@ -2,12 +2,12 @@ package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.command.Command;
 import com.alternatecomputing.jsvn.command.CommandException;
-import com.alternatecomputing.jsvn.command.Executable;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,13 +19,12 @@ import java.util.Map;
 /**
  * abstract class that all Command dialogs should extend to maintain a consistant look-and-feel
  */
-public abstract class CommandDialog extends CenterableDialog implements ActionListener {
+public abstract class CommandDialog extends CenterableDialog implements JSVNEventListener, ActionListener {
 	private static final String OK_TEXT = "OK";
 	private static final char OK_MNEMONIC = 'O';
 	private static final String CANCEL_TEXT = "Cancel";
 	private static final char CANCEL_MNEMONIC = 'C';
 	private String _targets;
-	private Executable _executor;
 	private JPanel _optionsPanel;
 	private JPanel _buttonPanel = new JPanel();
 	private JButton _okButton = new JButton();
@@ -82,30 +81,28 @@ public abstract class CommandDialog extends CenterableDialog implements ActionLi
 	protected void runCommand() throws CommandException {
 		Map args = new HashMap();
 		Command command = buildCommand(args);
-		try {
-			executeCommand(command, args);
-		} catch (CommandException e) {
-			postExecute(false);
-			throw e;
-		}
-		postExecute(true);
-	}
 
-	/**
-	 * executes the given command with the given arguments
-	 * @param command command to run
-	 * @param args arguments necessary to configure the command correctly
-	 * @throws CommandException
-	 */
-	private void executeCommand(Command command, Map args) throws CommandException {
-		_executor.executeCommand(command, args);
+		// create the executor
+		JSVNCommandExecutor executor = new JSVNCommandExecutor(command, args);
+
+		// add interested listeners
+		executor.addJSVNEventListener(this);
+		executor.addJSVNEventListener(Application.getApplicationFrame());
+
+		// invoke the executor in a separate thread
+		Thread t = new Thread(executor);
+		t.start();
 	}
 
 	/**
 	 * post command-execution hook for use by dialog
 	 * @param success command success indicator
 	 */
-	protected void postExecute(boolean success) {
+	public void postExecute(boolean success) {
+		if (success) {
+			this.setVisible(false);
+			this.dispose();
+		}
 	}
 	/**
 	 * gets the targets upon which the command should run
@@ -121,14 +118,6 @@ public abstract class CommandDialog extends CenterableDialog implements ActionLi
 	 */
 	public void setTargets(String targets) {
 		_targets = targets;
-	}
-
-	/**
-	 * sets the Executable class to which command execution is delegated
-	 * @param executor
-	 */
-	public void setExecutor(Executable executor) {
-		_executor = executor;
 	}
 
 	/**
@@ -160,8 +149,6 @@ public abstract class CommandDialog extends CenterableDialog implements ActionLi
 						if (isValidOptions()) {
 							try {
 								runCommand();
-								setVisible(false);
-								dispose();
 							} catch (CommandException ce) {
 								JOptionPane.showMessageDialog(_thisDialog.getContentPane(), ce.getMessage());
 							}
@@ -195,4 +182,35 @@ public abstract class CommandDialog extends CenterableDialog implements ActionLi
 		dispose();
 	}
 
+	/**
+	 * handles a JSVN user interface event
+	 * @param event UI event to handle
+	 */
+	public void processJSVNEvent(JSVNUIEvent event) {
+		// handle status events
+		if (event instanceof JSVNStatusEvent) {
+
+			// set the cursor appropriately
+			if (((JSVNStatusEvent) event).getStatus() == JSVNStatusEvent.EXECUTING) {
+				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			} else if (((JSVNStatusEvent) event).getStatus() == JSVNStatusEvent.READY) {
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			} else {
+				// XXX - log error
+			}
+			return;
+		}
+
+		// handle command events
+		if (event instanceof JSVNCommandEvent) {
+			String error = ((JSVNCommandEvent) event).getError();
+
+			// inform postExecute() of the command's success
+			if (error != null) {
+				postExecute(false);
+			} else {
+				postExecute(true);
+			}
+		}
+	}
 }

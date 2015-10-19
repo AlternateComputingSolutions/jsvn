@@ -21,10 +21,10 @@ public class Application {
 	private static final String ERR_NO_SVN = "Could not locate \"svn\" in your PATH, please correct this and try again";
 	private static final String ERR_MISSING_PROGRAM = "Missing Program";
 	public static String SVN_CMD_VERSION;
-	
+
 	public Application() {
 		ConfigurationManager.getInstance().loadConfig();
-		
+
 		// Check for the svn application in the path
 		//Runtime rt = Runtime.getRuntime();
 		try {
@@ -33,21 +33,21 @@ public class Application {
 			//proc.destroy();
 			CommandRunner runner = new CommandRunner();
 			runner.runCommand("svn --version");
-			SVN_CMD_VERSION = runner.getOutput();	
-			
+			SVN_CMD_VERSION = runner.getOutput();
+
 		} catch (CommandException ex) {
 			JOptionPane.showMessageDialog(new JFrame(),ERR_NO_SVN,
 										  ERR_MISSING_PROGRAM,
 										  JOptionPane.ERROR_MESSAGE);
-			
-			
+
+
 			System.exit(1);
-			
+
 		}
-		
+
 		_applicationFrame = new Frame();
 
-		
+
 		// center the frame on screen
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		Dimension frameSize = _applicationFrame.getSize();

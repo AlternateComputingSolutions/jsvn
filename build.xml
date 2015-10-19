@@ -12,7 +12,7 @@ Build file for JSVN application
       <tstamp/>
 
       <property name="name" value="jsvn"/>
-      <property name="build.version" value="0.5"/>
+      <property name="build.version" value="0.6"/>
       <property name="classes.dir" value="classes/"/>
       <property name="doc.dir" value="docs/"/>
       <property name="etc.dir" value="etc/"/>

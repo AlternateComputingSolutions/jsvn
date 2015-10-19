@@ -3,15 +3,14 @@ package com.alternatecomputing.jsvn.gui;
 import com.alternatecomputing.jsvn.command.Add;
 import com.alternatecomputing.jsvn.command.Cleanup;
 import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.command.CommandException;
 import com.alternatecomputing.jsvn.command.Delete;
-import com.alternatecomputing.jsvn.command.Executable;
 import com.alternatecomputing.jsvn.command.Info;
 import com.alternatecomputing.jsvn.command.Resolve;
 import com.alternatecomputing.jsvn.command.Revert;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import com.alternatecomputing.jsvn.model.SVNTreeModel;
 import com.alternatecomputing.jsvn.model.SVNTreeNodeData;
+import com.alternatecomputing.jsvn.Constants;
 
 import javax.swing.JComponent;
 import javax.swing.JMenu;
@@ -19,6 +18,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -67,16 +67,14 @@ public class JSVNTree extends JTree implements ActionListener {
 	private static final String ACTION_STATUS = "Status";
 	private static final String ACTION_SWITCH = "Switch";
 	private static final String ACTION_UPDATE = "Update";
-	private static final String NEWLINE_CHARACTER = "\n";
-    private Executable executor;
 	private JPopupMenu mainPopup;
 	private JMenuItem miAdd, miCat, miCheckout, miCleanup, miCommit, miDelete, miDiff, miImport, miCopy, miResolve, miMerge,
 	miMkDir, miMove, miRevert, miSwitch, miUpdate, miInfo, miLog, miStatus, miPropList, miPropGet, miPropSet,
 	miPropEdit, miPropDel, miRefreshOnline, miRefreshOffline;
 
-	public JSVNTree(SVNTreeModel root, Executable executor ) {
+	public JSVNTree(SVNTreeModel root) {
 		this.setModel(new DefaultTreeModel(buildTreeNode(root).getRoot()));
-        this.executor = executor;
+
 		// define the mainPopup
 		mainPopup = new JPopupMenu();
 		miAdd = new JMenuItem(ACTION_ADD);
@@ -302,23 +300,20 @@ public class JSVNTree extends JTree implements ActionListener {
 		if (targets == null) {
 			// user hasn't selected anything -- pop-up a error message
 		} else {
-			// Executable executor = (Executable) this.getTopLevelAncestor();
 			if (ae.getActionCommand().equals(ACTION_ADD)) {
 				// process add request
 				Command command = new Add();
 				Map args = new HashMap();
 				args.put(Add.TARGETS, targets);
-				executeDirectCommand(executor, command, args);
-				// process recursive offline refresh request so new working copy status can be displayed
-				refreshSelectedTargets(false);
+				executeDirectCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_CAT)) {
 				// process cat request
 				CommandDialog dialog = new CatDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_CHECKOUT)) {
 				// process checkout request
 				CommandDialog dialog = new CheckoutDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_CLEANUP)) {
 				// check that all targets are directories
 				TreePath[] paths = this.getSelectionPaths();
@@ -335,52 +330,43 @@ public class JSVNTree extends JTree implements ActionListener {
 				Command command = new Cleanup();
 				Map args = new HashMap();
 				args.put(Cleanup.TARGETS, targets);
-				executeDirectCommand(executor, command, args);
-				// process recursive offline refresh request so new working copy status can be displayed
-				refreshSelectedTargets(false);
+				executeDirectCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_COMMIT)) {
 				// process commit request
 				CommandDialog dialog = new CommitDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
-				// process offline recursive refresh request so new working copy status can be displayed
-				refreshSelectedTargets(false);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_COPY)) {
 				// process copy request
 				CommandDialog dialog = new CopyDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
-				refreshSelectedTargets(false);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_DELETE)) {
 				// process delete request
 				Command command = new Delete();
 				Map args = new HashMap();
 				args.put(Delete.TARGETS, targets);
-				executeDirectCommand(executor, command, args);
-				// process recursive offline refresh request so new working copy status can be displayed
-				refreshSelectedTargets(false);
+				executeDirectCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_DIFF)) {
 				// process diff request
 				CommandDialog dialog = new DiffDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_INFO)) {
 				// process info request
 				Command command = new Info();
 				Map args = new HashMap();
 				args.put(Info.TARGETS, targets);
-				executeDirectCommand(executor, command, args);
+				executeDirectCommand(command, args);
 			} else if (ae.getActionCommand().equals(ACTION_LOG)) {
 				// process log request
 				CommandDialog dialog = new LogDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_MERGE)) {
 				// process merge request
 				CommandDialog dialog = new MergeDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
-				refreshSelectedTargets(false);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_MOVE)) {
 				// process move request
 				CommandDialog dialog = new MoveDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
-				refreshSelectedTargets(false);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_REFRESH_ONLINE)) {
 				// process recursive online refresh request
 				refreshSelectedTargets(true);
@@ -393,7 +379,7 @@ public class JSVNTree extends JTree implements ActionListener {
 				String[] targetArray = getSelectedTargetsAsArray();
 				for (int i = 0; i < targetArray.length; i++) {
 					String s = targetArray[i];
-					message += s + NEWLINE_CHARACTER;
+					message += s + Constants.NEWLINE_CHARACTER;
 				}
 				int confirmation = JOptionPane.showConfirmDialog(this, message, CONFIRMATION, JOptionPane.OK_CANCEL_OPTION);
 				if (confirmation == JOptionPane.OK_OPTION) {
@@ -401,9 +387,7 @@ public class JSVNTree extends JTree implements ActionListener {
 					Command command = new Resolve();
 					Map args = new HashMap();
 					args.put(Resolve.TARGETS, targets);
-					executeDirectCommand(executor, command, args);
-					// process recursive offline refresh request so new working copy status can be displayed
-					refreshSelectedTargets(false);
+					executeDirectCommand(command, args);
 				}
 			} else if (ae.getActionCommand().equals(ACTION_REVERT)) {
 				// process revert request
@@ -411,7 +395,7 @@ public class JSVNTree extends JTree implements ActionListener {
 				String[] targetArray = getSelectedTargetsAsArray();
 				for (int i = 0; i < targetArray.length; i++) {
 					String s = targetArray[i];
-					message += s + NEWLINE_CHARACTER;
+					message += s + Constants.NEWLINE_CHARACTER;
 				}
 				int confirmation = JOptionPane.showConfirmDialog(this, message, CONFIRMATION, JOptionPane.OK_CANCEL_OPTION);
 				if (confirmation == JOptionPane.OK_OPTION) {
@@ -419,24 +403,20 @@ public class JSVNTree extends JTree implements ActionListener {
 					Command command = new Revert();
 					Map args = new HashMap();
 					args.put(Revert.TARGETS, targets);
-					executeDirectCommand(executor, command, args);
-					// process recursive offline refresh request so new working copy status can be displayed
-					refreshSelectedTargets(false);
+					executeDirectCommand(command, args);
 				}
 			} else if (ae.getActionCommand().equals(ACTION_STATUS)) {
 				// process status request
 				CommandDialog dialog = new StatusDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_SWITCH)) {
 				// process switch request
 				CommandDialog dialog = new SwitchDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
+				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_UPDATE)) {
 				// process update request
 				CommandDialog dialog = new UpdateDialog(Application.getApplicationFrame(), true);
-				initializeAndShowDialog(dialog, targets, executor);
-				// process offline recursive refresh request so new working copy status can be displayed
-				refreshSelectedTargets(false);
+				initializeAndShowDialog(dialog, targets);
 			}
 		}
 	}
@@ -445,26 +425,24 @@ public class JSVNTree extends JTree implements ActionListener {
 	 * initialized a dialog and makes it visible
 	 * @param dialog CommandDialog to be initialized and shown
 	 * @param targets targets for the command
-	 * @param executor command executor
 	 */
-	private void initializeAndShowDialog(CommandDialog dialog, String targets, Executable executor) {
+	private void initializeAndShowDialog(CommandDialog dialog, String targets) {
 		dialog.setTargets(targets);
-		dialog.setExecutor(executor);
 		dialog.setVisible(true);
 	}
 
 	/**
 	 * executes a command that does not need any additional options from a dialog
-	 * @param executor command executor
 	 * @param command command to be run
 	 * @param args parameters to configure the command correctly
 	 */
-	private void executeDirectCommand(Executable executor, Command command, Map args) {
-		try {
-			executor.executeCommand(command, args);
-		} catch (CommandException e) {
-			showMessageDialog(e.getMessage());
-		}
+	private void executeDirectCommand(Command command, Map args) {
+		JSVNCommandExecutor executor = new JSVNCommandExecutor(command, args);
+		executor.addJSVNEventListener(Application.getApplicationFrame());
+
+		// invoke the executor in a separate thread
+		Thread t = new Thread(executor);
+		t.start();
 	}
 
 	/**
@@ -544,17 +522,34 @@ public class JSVNTree extends JTree implements ActionListener {
 	 * @param node node at which to begin the resursive refresh
 	 * @param online indicator as to whether an online refresh should be performed
 	 */
-	private void refresh(DefaultMutableTreeNode node, boolean online) {
+	private void refresh(final DefaultMutableTreeNode node, final boolean online) {
 		SVNTreeNodeData nodeData = (SVNTreeNodeData) node.getUserObject();
 		// if a userObject doesn't exist for the given node, then just return
 		if (nodeData == null) {
 			return;
 		}
-		String workingCopy = ConfigurationManager.getInstance().getWorkingDirectory() + nodeData.getPath();
-		SVNTreeModel partialModel = new SVNTreeModel(workingCopy, online);
-		DefaultMutableTreeNode foo = buildTreeNode(partialModel);
-		// reconcile updated tree with current tree
-		reconcileNodes(node, foo);
+		final String workingCopy = ConfigurationManager.getInstance().getWorkingDirectory() + nodeData.getPath();
+		// since building SVNTreeModel and buildTreeNode can take some time, we'll execute them in a separate thread
+		// so that we can continue updating the UI in realtime.
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Application.getApplicationFrame().processJSVNEvent(new JSVNStatusEvent(JSVNStatusEvent.REFRESHING));
+					}
+				});
+				SVNTreeModel partialModel = new SVNTreeModel(workingCopy, online);
+				DefaultMutableTreeNode foo = buildTreeNode(partialModel);
+				// reconcile updated tree with current tree
+				reconcileNodes(node, foo);
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						Application.getApplicationFrame().processJSVNEvent(new JSVNStatusEvent(JSVNStatusEvent.READY));
+					}
+				});
+			}
+		});
+		t.start();
 	}
 
 	/**

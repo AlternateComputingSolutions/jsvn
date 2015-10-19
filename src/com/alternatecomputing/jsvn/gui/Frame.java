@@ -2,15 +2,30 @@ package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.Constants;
 import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.command.CommandException;
-import com.alternatecomputing.jsvn.command.Executable;
 import com.alternatecomputing.jsvn.configuration.Configuration;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import com.alternatecomputing.jsvn.model.SVNTreeModel;
 
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextPane;
 import javax.swing.tree.DefaultTreeModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -22,10 +37,12 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
 
 
-public class Frame extends CenterableFrame implements ActionListener, Executable {
+/**
+ * main GUI for JSVN
+ */
+public class Frame extends CenterableFrame implements JSVNEventListener, ActionListener {
 	private static final char MNEMONIC_CHECKOUT = 'C';
 	private static final char MNEMONIC_SET_WORKING_COPY = 'S';
 	private static final char MNEMONIC_WORKING_COPY = 'W';
@@ -36,8 +53,6 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 	private static final char MNEMONIC_FILE = 'F';
 	private static final String CONFIRMATION = "Confirmation";
 	private static final String OVERWRITE_EXISTING_FILE = "Overwrite existing file?";
-	private static final String NEWLINE_CHARACTER = "\n";
-	private static final String PERIOD_CHARACTER = ".";
 	private static final String ACTION_CLOSE_TAB = "CloseTab";
 	private static final String ACTION_CLOSE_ALL_TAB = "CloseAllTab";
 	private static final String ACTION_CLOSE_ALL_BUT_THIS_TAB = "CloseAllButThisTab";
@@ -56,31 +71,27 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 	private static final String MENU_ITEM_SAVE = "Save To File";
 	private static final String STATUS_READY = "Ready";
 	private static final String STATUS_EXECUTING = "Executing...";
+	private static final String STATUS_REFRESHING = "Refreshing...";
 	private static final String TAB_COMMAND_HISTORY = "Command History";
-    private JPanel content;
+	private JPanel content;
 	private JLabel _statusBar = new JLabel(STATUS_READY);
 	private JTabbedPane _outputTabbedPane = new JTabbedPane();
 	private JTextPane _historyTextPane = new JTextPane();
 	private JSVNTree _svnTree;
 	private JPopupMenu _popupMenu;
 	private JMenuItem _miCloseTab, _miCloseAllTab, _miCloseAllButThisTab, _miSaveTab;
-    private Executable _executor;
 
-    /** constructor with provided executor */
-    public Frame( Executable executor ) {
-        _executor = executor;
-        initGUI();
-        pack();
-    }
-
-    /** constructor */
+	/**
+	 * constructor
+	 */
 	public Frame() {
-        _executor = this;
 		initGUI();
 		pack();
 	}
 
-	/** this method is called from within the constructor to initialize the form */
+	/**
+	 * this method is called from within the constructor to initialize the form
+	 */
 	private void initGUI() {
 		getContentPane().setLayout(new BorderLayout());
 
@@ -123,7 +134,7 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 					public void actionPerformed(ActionEvent e) {
 
 						Configuration c = ConfigurationManager.getInstance().getConfig();
-                        JFileChooser chooser;
+						JFileChooser chooser;
 						String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
 						if (workingDirectory != null) {
 							File currentWorkingDirectory = new File(workingDirectory);
@@ -150,8 +161,8 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 							}
 						}
 
-                        setWorkingCopy(  ConfigurationManager.getInstance().getWorkingCopy() );
-                    }
+						setWorkingCopy(ConfigurationManager.getInstance().getWorkingCopy());
+					}
 				});
 
 		menuWorkingCopy.add(workingCopySet);
@@ -163,7 +174,6 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 					public void actionPerformed(ActionEvent e) {
 						// process commit request
 						CheckoutDialog dialog = new CheckoutDialog(Application.getApplicationFrame(), true);
-						dialog.setExecutor(Application.getApplicationFrame());
 						dialog.setVisible(true);
 					}
 				});
@@ -215,7 +225,7 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 
 		// install the new tree model
 		SVNTreeModel model = new SVNTreeModel(ConfigurationManager.getInstance().getWorkingCopy(), false);
-		_svnTree = new JSVNTree(model, _executor);
+		_svnTree = new JSVNTree(model);
 		JScrollPane svnPane = new JScrollPane();
 		svnPane.setViewportView(_svnTree);
 		mainSplitPane.add(svnPane, JSplitPane.LEFT);
@@ -292,36 +302,13 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 		);
 	}
 
-    public void setWorkingCopy( String workingCopy ) {
-        SVNTreeModel svnTreeModel = new SVNTreeModel( workingCopy, false);
-        _svnTree.setModel(new DefaultTreeModel(JSVNTree.buildTreeNode(svnTreeModel)));
-    }
-
-    /**
-	 * executes the given command with the given arguments
-	 * @param command command to be run
-	 * @param args arguments for the command
+	/**
+	 * sets the working copy and updates UI with the new tree model
+	 * @param workingCopy
 	 */
-	public void executeCommand(Command command, Map args) throws CommandException {
-		try {
-			_statusBar.setText(STATUS_EXECUTING);
-			command.init(args);
-			command.execute();
-			String result = command.getResult();
-			_historyTextPane.setText(_historyTextPane.getText() + command.getCommand() + NEWLINE_CHARACTER);
-			JTextPane newPane = new JTextPane();
-
-            Font fixedFont = new Font("Monospaced", Font.PLAIN, 10 );
-            newPane.setFont( fixedFont );
-			newPane.setText(result);
-			newPane.setEditable(false);
-			JScrollPane scrollPane = new JScrollPane(newPane);
-			String commandName = command.getClass().getName();
-			_outputTabbedPane.add(commandName.substring(commandName.lastIndexOf(PERIOD_CHARACTER) + 1), scrollPane);
-			_outputTabbedPane.setSelectedIndex(_outputTabbedPane.getTabCount() - 1);
-		} finally {
-			_statusBar.setText(STATUS_READY);
-		}
+	public void setWorkingCopy(String workingCopy) {
+		SVNTreeModel svnTreeModel = new SVNTreeModel(workingCopy, false);
+		_svnTree.setModel(new DefaultTreeModel(JSVNTree.buildTreeNode(svnTreeModel)));
 	}
 
 	/**
@@ -332,7 +319,8 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 	}
 
 	/**
-	 * Invoked when an action occurs.
+	 * invoked when an action occurs.
+	 * @param e
 	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getActionCommand().equals(ACTION_CLOSE_TAB)) {
@@ -400,8 +388,57 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 		writer.close();
 	}
 
-    public JPanel getContent() {
-        return content;
-    }
+	/**
+	 * returns the content panel
+	 * @return
+	 */
+	public JPanel getContent() {
+		return content;
+	}
 
+	/**
+	 * handles a JSVN user interface event
+	 * @param event UI event to handle
+	 */
+	public void processJSVNEvent(JSVNUIEvent event) {
+		// handle status events
+		if (event instanceof JSVNStatusEvent) {
+			if (((JSVNStatusEvent) event).getStatus() == JSVNStatusEvent.EXECUTING) {
+				_statusBar.setText(STATUS_EXECUTING);
+				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			} else if (((JSVNStatusEvent) event).getStatus() == JSVNStatusEvent.READY) {
+				_statusBar.setText(STATUS_READY);
+				setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+			} else if (((JSVNStatusEvent) event).getStatus() == JSVNStatusEvent.REFRESHING) {
+				_statusBar.setText(STATUS_REFRESHING);
+				setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+			} else {
+				// XXX - log error
+			}
+			return;
+		}
+
+		// handle command events
+		if (event instanceof JSVNCommandEvent) {
+			String error = ((JSVNCommandEvent) event).getError();
+			if (error != null) {
+				JOptionPane.showMessageDialog(Application.getApplicationFrame().getContentPane(), error);
+			} else {
+				// create a new output tab
+				Command command = ((JSVNCommandEvent) event).getCommand();
+				String result = ((JSVNCommandEvent) event).getResult();
+				_historyTextPane.setText(_historyTextPane.getText() + command.getCommand() + Constants.NEWLINE_CHARACTER);
+				JTextPane newPane = new JTextPane();
+				Font fixedFont = new Font("Monospaced", Font.PLAIN, 10);
+				newPane.setFont(fixedFont);
+				newPane.setText(result);
+				newPane.setEditable(false);
+				JScrollPane scrollPane = new JScrollPane(newPane);
+				String commandName = command.getClass().getName();
+				_outputTabbedPane.add(commandName.substring(commandName.lastIndexOf(Constants.PERIOD_CHARACTER) + 1), scrollPane);
+				_outputTabbedPane.setSelectedIndex(_outputTabbedPane.getTabCount() - 1);
+				_svnTree.refresh(false);
+			}
+		}
+	}
 }

@@ -41,14 +41,6 @@ public class Configuration implements Cloneable {
 	}
 
 	/**
-	 * sets all properties from another Configuration object
-	 * @param config Configuration object which contains values to use
-	 */
-	public void setValues(Configuration config) {
-		setWorkingCopy(config.getWorkingCopy());
-	}
-
-	/**
 	 * return a copy of the object
 	 * @return Copy of the object
 	 */

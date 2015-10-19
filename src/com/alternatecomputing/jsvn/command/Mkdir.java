@@ -17,7 +17,6 @@ import java.util.Map;
  *	  --message-encoding arg   : take log message in charset encoding ARG
  */
 public class Mkdir extends Command {
-	protected boolean _mustAuthenticate = true;
 
 	public void init(Map args) throws CommandException {
 	}
