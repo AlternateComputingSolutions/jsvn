@@ -35,6 +35,8 @@ import java.util.Map;
  * graphical representation of a SVNTreeModel
  */
 public class JSVNTree extends JTree implements ActionListener {
+	private static final String DOUBLE_QUOTE = "\"";
+	private static final String SPACE = " ";
 	private static final String CONFIRMATION = "Confirmation";
 	private static final String CLEANUP_ERROR = "The following item is not a directory:\n\n";
 	private static final String RESOLVE_WARNING = "You are about to resolve the following items:\n\n";
@@ -468,8 +470,15 @@ public class JSVNTree extends JTree implements ActionListener {
 			TreePath path = paths[i];
 			DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
 			SVNTreeNodeData svnNode = (SVNTreeNodeData) dmtn.getUserObject();
-			targets.append(ConfigurationManager.getInstance().getWorkingDirectory());
-			targets.append(svnNode.getPath()).append(" ");
+			String target = ConfigurationManager.getInstance().getWorkingDirectory() + svnNode.getPath();
+
+			// if target contains a space, wrap the target in quotes (eg: c:\Document and Settings\...)
+			if (target.indexOf(SPACE) > -1) {
+				targets.append(DOUBLE_QUOTE).append(target).append(DOUBLE_QUOTE);
+			} else {
+				targets.append(target);
+			}
+			targets.append(" ");
 		}
 		return targets.toString().trim();
 	}

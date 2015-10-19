@@ -3,7 +3,6 @@ package com.alternatecomputing.jsvn.model;
 import com.alternatecomputing.jsvn.command.CommandException;
 import com.alternatecomputing.jsvn.command.Status;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;

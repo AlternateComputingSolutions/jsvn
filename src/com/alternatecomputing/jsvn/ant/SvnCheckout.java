@@ -9,9 +9,12 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+
 public class SvnCheckout extends AbstractSvnTask {
 
-	private int revision = -1;
+	private String revision = "HEAD";
 	private String username = "";
 	private String password = "";
 
@@ -28,12 +31,17 @@ public class SvnCheckout extends AbstractSvnTask {
 		args.put(Checkout.DESTINATION, getDestinationPath());
 		args.put(Checkout.USERNAME, getUsername());
 		args.put(Checkout.PASSWORD, getPassword());
-		args.put(Checkout.REVISION, Integer.toString(revision));
+		args.put(Checkout.REVISION, revision);
 		args.put(Checkout.NONRECURSIVE, new Boolean(!recursive));
 		Command command = new Checkout();
 		command.init(args);
 
 		return command;
+	}
+	
+	public void execute() throws BuildException {
+		log("checking out : " + getRepositoryUrl(),Project.MSG_INFO);	
+		super.execute();
 	}
 
 	private String getDestinationPath() throws CommandException{
@@ -54,7 +62,7 @@ public class SvnCheckout extends AbstractSvnTask {
 		return date;
 	}
 
-	public int getRevision() {
+	public String getRevision() {
 		return revision;
 	}
 
@@ -80,7 +88,7 @@ public class SvnCheckout extends AbstractSvnTask {
 		recursive = b;
 	}
 
-	public void setRevision(int i) {
+	public void setRevision(String i) {
 		revision = i;
 	}
 

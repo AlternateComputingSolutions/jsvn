@@ -33,6 +33,7 @@ public class SVNTreeNodeData {
 	public static final int PROPERTY_STATUS_CONFLICT = 2;
 
 	private String _path;
+	private String _name;
 	private int _revision = NOT_VERSIONED;
 	private int _nodeKind;
 	private int _fileStatus;
@@ -107,7 +108,10 @@ public class SVNTreeNodeData {
 	 * @return name
 	 */
 	public String getName() {
-		return _path.substring(_path.lastIndexOf(Constants.SVN_PATH_SEPARATOR) + 1);
+		return _name;
+	}
+	public void setName(String n) {
+		_name = n;
 	}
 
 	/**

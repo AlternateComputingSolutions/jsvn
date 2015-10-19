@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
 import com.alternatecomputing.jsvn.command.Command;
@@ -34,8 +35,8 @@ public abstract class AbstractSvnTask extends Task {
 			if (failOnError){
 				throw new BuildException (e);
 			}else{
-				log(e.getMessage());
-				log(""+e.getStackTrace());
+				log(e.getMessage(),Project.MSG_ERR);
+				log(""+e.getStackTrace(),Project.MSG_ERR);
 			}
 		} finally{
 			ConfigurationManager.getInstance().setConfig(backupConfig);

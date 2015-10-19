@@ -23,30 +23,20 @@ public class Application {
 	public static String SVN_CMD_VERSION;
 
 	public Application() {
+
 		ConfigurationManager.getInstance().loadConfig();
 
-		// Check for the svn application in the path
-		//Runtime rt = Runtime.getRuntime();
 		try {
-			// execute the command
-			//Process proc = rt.exec("svn --version", null);
-			//proc.destroy();
 			CommandRunner runner = new CommandRunner();
 			runner.runCommand("svn --version");
 			SVN_CMD_VERSION = runner.getOutput();
 
 		} catch (CommandException ex) {
-			JOptionPane.showMessageDialog(new JFrame(),ERR_NO_SVN,
-										  ERR_MISSING_PROGRAM,
-										  JOptionPane.ERROR_MESSAGE);
-
-
+			JOptionPane.showMessageDialog(new JFrame(),ERR_NO_SVN,ERR_MISSING_PROGRAM,JOptionPane.ERROR_MESSAGE);
 			System.exit(1);
-
 		}
 
-		_applicationFrame = new Frame();
-
+		new SplashScreen("/com/alternatecomputing/jsvn/gui/resources/jsvn_logo.png", _applicationFrame = new Frame(),5000);
 
 		// center the frame on screen
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();

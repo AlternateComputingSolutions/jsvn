@@ -1,8 +1,6 @@
 package com.alternatecomputing.jsvn.model;
 
-import com.alternatecomputing.jsvn.Constants;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
-import com.alternatecomputing.jsvn.model.SVNTreeNodeData;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -12,6 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+/**
+ * This parser takes the output from an svn status command and returns the root node of a hierarchy of SVNTreeNodeData
+ * objects representing a working copy.
+ */
 public class Parser {
 	private static final int FILE_STATUS_POS = 0;
 	private static final int PROPERTY_STATUS_POS = 1;
@@ -19,6 +21,7 @@ public class Parser {
 	private static final int WITH_HISTORY_POS = 3;
 	private static final int SWITCHED_POS = 4;
 	private static final int OUTDATED_POS = 7;
+	private static final String HEAD_REVISION_PREFIX = "Head revision";
 
 	/**
 	 * parses the output of a svn status command and returns the root of a JTree that represents the working copy
@@ -29,33 +32,37 @@ public class Parser {
 	public static SVNTreeNodeData parse(String result) throws IOException {
 		Map nodeCache = new HashMap();
 		BufferedReader reader = new BufferedReader(new StringReader(result));
-		int baseIndex = -1;
 		String item;
+		File localItem;
 		SVNTreeNodeData root = null;
 		SVNTreeNodeData parent;
+		String wkdirpath = new File(ConfigurationManager.getInstance().getWorkingDirectory()).getCanonicalPath();
+
 		// loop through the command output
 		while ((item = reader.readLine()) != null) {
-			// pick out the first few pieces of info from the status
-			String fileStatus = item.substring(FILE_STATUS_POS, FILE_STATUS_POS + 1);
-			String propertyStatus = item.substring(PROPERTY_STATUS_POS, PROPERTY_STATUS_POS + 1);
-			String lockedIndicator = item.substring(LOCKED_STATUS_POS, LOCKED_STATUS_POS + 1);
-			String historyIndicator = item.substring(WITH_HISTORY_POS, WITH_HISTORY_POS + 1);
-			String switchedIndicator = item.substring(SWITCHED_POS, SWITCHED_POS + 1);
-			String outdatedIndicator = item.substring(OUTDATED_POS, OUTDATED_POS + 1);
-			// grab the rest of the status info
-			item = item.substring(OUTDATED_POS + 1);
-			// create new node with revision attributes
-			SVNTreeNodeData nodeData = new SVNTreeNodeData();
 			// when using "svn status -u", the last line doesn't contain any file info, just the revision number, so don't parse it.
-			if (item.indexOf(ConfigurationManager.getInstance().getWorkingDirectory()) > -1) {
-				baseIndex = item.indexOf(ConfigurationManager.getInstance().getWorkingDirectory()) + ConfigurationManager.getInstance().getWorkingDirectory().length();
-				// extract working copy portion from the absolue path
-				String resource = item.substring(baseIndex);
-				nodeData.setPath(resource);
+			if (!item.startsWith(HEAD_REVISION_PREFIX)) {
+				// pick out the first few pieces of info from the status
+				String fileStatus = item.substring(FILE_STATUS_POS, FILE_STATUS_POS + 1);
+				String propertyStatus = item.substring(PROPERTY_STATUS_POS, PROPERTY_STATUS_POS + 1);
+				String lockedIndicator = item.substring(LOCKED_STATUS_POS, LOCKED_STATUS_POS + 1);
+				String historyIndicator = item.substring(WITH_HISTORY_POS, WITH_HISTORY_POS + 1);
+				String switchedIndicator = item.substring(SWITCHED_POS, SWITCHED_POS + 1);
+				String outdatedIndicator = item.substring(OUTDATED_POS, OUTDATED_POS + 1);
+
+				// grab the rest of the status info
+				item = item.substring(OUTDATED_POS + 1);
+
+				// create new node with revision attributes
+				SVNTreeNodeData nodeData = new SVNTreeNodeData();
 
 				// handle the file status
 				handleFileStatus(fileStatus, nodeData);
 				if (fileStatus.equals("?")) {
+					localItem = new File(item.trim());
+					nodeData.setPath(localItem.getCanonicalPath().substring(wkdirpath.length()));
+					nodeData.setName(localItem.getName());
+
 					// item is not under revision control
 					nodeData.setRevision(SVNTreeNodeData.NOT_VERSIONED);
 					nodeData.setLastChangedRevision(SVNTreeNodeData.NOT_VERSIONED);
@@ -81,55 +88,55 @@ public class Parser {
 
 					// parse working revision
 					String token = st.nextToken();
-					boolean existsInWorkingCopy;
 					if (token.equals("-")) {
 						nodeData.setRevision(SVNTreeNodeData.NOT_VERSIONED);
-						existsInWorkingCopy = true;
 					} else {
 						try {
 							nodeData.setRevision(Integer.parseInt(token));
-							existsInWorkingCopy = true;
 						} catch (NumberFormatException e) {
 							nodeData.setRevision(SVNTreeNodeData.UNKNOWN_VERSION);
-							existsInWorkingCopy = false;
 						}
 					}
 
-					if (existsInWorkingCopy) {
-						// parse last change revision
-						token = st.nextToken();
-						if (token.equals("?")) {
-							nodeData.setLastChangedRevision(SVNTreeNodeData.NOT_VERSIONED);
-						} else {
-							nodeData.setLastChangedRevision(Integer.parseInt(token));
-						}
-
-						// parse last change author
-						nodeData.setLastChangedAuthor(st.nextToken());
+					// parse last change revision
+					token = st.nextToken();
+					if (token.equals("?")) {
+						nodeData.setLastChangedRevision(SVNTreeNodeData.NOT_VERSIONED);
+					} else {
+						nodeData.setLastChangedRevision(Integer.parseInt(token));
 					}
+
+					// parse last change author
+					nodeData.setLastChangedAuthor(st.nextToken());
+
+					String fileName = st.nextToken("");
+					localItem = new File(fileName.trim());
+					nodeData.setPath(localItem.getCanonicalPath().substring(wkdirpath.length()));
+					nodeData.setName(localItem.getName());
 				}
+
 				// determine if it's a file or directory
-				File file = new File(ConfigurationManager.getInstance().getWorkingDirectory() + resource);
-				if (file.isDirectory()) {
+				if (localItem.isDirectory()) {
 					nodeData.setNodeKind(SVNTreeNodeData.NODE_KIND_DIRECTORY);
 				} else {
 					nodeData.setNodeKind(SVNTreeNodeData.NODE_KIND_FILE);
 				}
-				// grab everything up to the resource name to use as hash key
-				// for the parent node we need to link this node to
-				String parentDir = resource.lastIndexOf(Constants.SVN_PATH_SEPARATOR) == -1 ? null : resource.substring(0, resource.lastIndexOf(Constants.SVN_PATH_SEPARATOR));
+
 				// look in cache for parent to link this node to
-				parent = (SVNTreeNodeData) nodeCache.get(parentDir);
+				parent = (SVNTreeNodeData) nodeCache.get(localItem.getParentFile());
 				if (parent == null) {
+
 					// no root exists yet so this node must be the tree root
 					parent = nodeData;
 					root = nodeData;
 				} else {
+
 					// add the new node to the parent
 					parent.getChildren().add(nodeData);
 				}
+
 				// cache the new node
-				nodeCache.put(resource, nodeData);
+				nodeCache.put(localItem, nodeData);
 			}
 		}
 		return root;
@@ -261,6 +268,5 @@ public class Parser {
 			// XXX - log error
 		}
 	}
-
-
 }
+

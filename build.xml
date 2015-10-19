@@ -12,7 +12,7 @@ Build file for JSVN application
       <tstamp/>
 
       <property name="name" value="jsvn"/>
-      <property name="build.version" value="0.6"/>
+      <property name="build.version" value="0.7"/>
       <property name="classes.dir" value="classes/"/>
       <property name="doc.dir" value="docs/"/>
       <property name="etc.dir" value="etc/"/>
@@ -106,6 +106,7 @@ Build file for JSVN application
         <!--this task copies the ant task definition file to the root of the jar file, for ease of use within ant -->
         <copy file="${etc.dir}/taskdef.properties" todir="${classes.dir}" />
         <copy file="${etc.dir}/plugin.xml" todir="${classes.dir}/META-INF"/>
+        <copy file="${src.dir}/com/alternatecomputing/jsvn/gui/resources/jsvn_logo.png" todir="${classes.dir}/com/alternatecomputing/jsvn/gui/resources/" />
 
         <jar basedir="${classes.dir}" jarfile="${dist.dir}/${finaljarfile.name}">
             <manifest>

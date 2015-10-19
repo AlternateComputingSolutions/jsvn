@@ -44,6 +44,9 @@ public class CommandRunner {
 			File dir;
 			if (workingCopy != null) {
 				dir = new File(workingCopy);
+				if (!dir.exists()) {
+					dir = new File(System.getProperty("user.home"));
+				}
 			} else {
 				dir = new File(System.getProperty("user.home"));
 			}
