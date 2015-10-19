@@ -82,7 +82,13 @@ public abstract class CommandDialog extends CenterableDialog implements ActionLi
 	protected void runCommand() throws CommandException {
 		Map args = new HashMap();
 		Command command = buildCommand(args);
-		executeCommand(command, args);
+		try {
+			executeCommand(command, args);
+		} catch (CommandException e) {
+			postExecute(false);
+			throw e;
+		}
+		postExecute(true);
 	}
 
 	/**
@@ -95,6 +101,12 @@ public abstract class CommandDialog extends CenterableDialog implements ActionLi
 		_executor.executeCommand(command, args);
 	}
 
+	/**
+	 * post command-execution hook for use by dialog
+	 * @param success command success indicator
+	 */
+	protected void postExecute(boolean success) {
+	}
 	/**
 	 * gets the targets upon which the command should run
 	 * @return targets

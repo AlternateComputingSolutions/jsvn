@@ -13,6 +13,7 @@ import java.util.Map;
  *	    command will not remove TARGETs that are, or contain, unversioned
  *	    or modified items; use the --force option to override this
  *	    behaviour.
+ *
  *	  * If run on an URL, item is deleted from the repository via an
  *	    immediate commit.
  *
@@ -26,8 +27,7 @@ import java.util.Map;
  *	  --message-encoding arg   : take log message in charset encoding ARG
  */
 public class Delete extends Command {
-	private static final String COMMAND = "svn delete --message {0} {1}";
-	public static final String COMMIT_MESSAGE = "COMMIT_MESSAGE";
+	private static final String COMMAND = "svn delete {0}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
@@ -38,12 +38,7 @@ public class Delete extends Command {
 			throw new CommandException("Missing targets");
 		}
 
-		String commitMessage = (String) args.get(COMMIT_MESSAGE);
-		if (commitMessage == null) {
-			throw new CommandException("Missing commit message");
-		}
-
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{"'" + commitMessage + "'", targets}));
+		setCommand(MessageFormat.format(COMMAND, new String[]{targets}));
 	}
 }

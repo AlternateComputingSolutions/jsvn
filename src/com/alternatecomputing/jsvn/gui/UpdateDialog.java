@@ -52,7 +52,7 @@ public class UpdateDialog extends CommandDialog {
 
         jPanel1.setPreferredSize(new java.awt.Dimension(475, 175));
         jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Revision");
+        jRadioButton1.setText("Revision:");
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -64,11 +64,11 @@ public class UpdateDialog extends CommandDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.ipadx = 12;
+        gridBagConstraints.ipadx = 9;
         gridBagConstraints.insets = new java.awt.Insets(30, 50, 50, 0);
         jPanel1.add(jRadioButton1, gridBagConstraints);
 
-        jRadioButton2.setText("Date");
+        jRadioButton2.setText("Date:");
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -79,7 +79,7 @@ public class UpdateDialog extends CommandDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 36;
+        gridBagConstraints.ipadx = 33;
         gridBagConstraints.insets = new java.awt.Insets(31, 50, 0, 0);
         jPanel1.add(jRadioButton2, gridBagConstraints);
 

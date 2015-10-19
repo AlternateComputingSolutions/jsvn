@@ -10,7 +10,8 @@ import java.util.ArrayList;
  */
 public class SVNTreeNodeData {
 	// revision constants
-	public static final int NOT_VERSIONED = 0;
+	public static final int UNKNOWN_VERSION = -2;
+	public static final int NOT_VERSIONED = -1;
 
 	// node kind constants
 	public static final int NODE_KIND_FILE = 0;
@@ -307,7 +308,9 @@ public class SVNTreeNodeData {
 				return "";
 		}
 		if (_isOutDated) {
-			if (_fileStatus == FILE_STATUS_NO_CHANGES) {
+			if (_revision == UNKNOWN_VERSION) {
+				result += "new repository file";
+			} else if (_fileStatus == FILE_STATUS_NO_CHANGES) {
 				result += "out-of-date";
 			} else {
 				result += ", out-of-date";
@@ -345,6 +348,9 @@ public class SVNTreeNodeData {
 	 * @return true if the two instances are equivalent
 	 */
 	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
 		SVNTreeNodeData o = (SVNTreeNodeData) obj;
 		return (getPath().equals(o.getPath())
 				&& getRevision() == o.getRevision()
@@ -360,6 +366,9 @@ public class SVNTreeNodeData {
 	 * @param node instance from which to copy values
 	 */
 	public void copyNodeValues(SVNTreeNodeData node) {
+		if (node == null) {
+			return;
+		}
 		setPath(node.getPath());
 		setRevision(node.getRevision());
 		setNodeKind(node.getNodeKind());

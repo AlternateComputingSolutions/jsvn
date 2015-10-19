@@ -1,7 +1,7 @@
 package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.command.Command;
-import com.alternatecomputing.jsvn.command.Diff;
+import com.alternatecomputing.jsvn.command.Merge;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -11,16 +11,16 @@ import java.util.Map;
 /**
  *
  */
-public class DiffDialog extends CommandDialog {
-	private static final String DIALOG_TITLE = "Diff";
-	private static final String DIALOG_CAPTION = "Diff Options";
+public class MergeDialog extends CommandDialog {
+	private static final String DIALOG_TITLE = "Merge";
+	private static final String DIALOG_CAPTION = "Merge Options";
 
 	/**
      * constructor
      * @param parent parent frame
      * @param modal boolean indicating whether or not this dialog is modal
      */
-        public DiffDialog(Frame parent, boolean modal) {
+        public MergeDialog(Frame parent, boolean modal) {
             super(parent, modal);
     }
 
@@ -38,12 +38,12 @@ public class DiffDialog extends CommandDialog {
         jRadioButton2 = new javax.swing.JRadioButton();
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
-        jTextField3 = new javax.swing.JTextField();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
         jCheckBox1 = new javax.swing.JCheckBox();
+        jCheckBox2 = new javax.swing.JCheckBox();
+        jLabel3 = new javax.swing.JLabel();
+        jTextField3 = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -53,9 +53,9 @@ public class DiffDialog extends CommandDialog {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(475, 225));
+        jPanel1.setPreferredSize(new java.awt.Dimension(470, 260));
         jRadioButton1.setSelected(true);
-        jRadioButton1.setText("Revision:");
+        jRadioButton1.setText("Revision 1:");
         buttonGroup1.add(jRadioButton1);
         jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -67,11 +67,11 @@ public class DiffDialog extends CommandDialog {
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridheight = 2;
-        gridBagConstraints.ipadx = 19;
-        gridBagConstraints.insets = new java.awt.Insets(20, 40, 50, 0);
+        gridBagConstraints.ipadx = 7;
+        gridBagConstraints.insets = new java.awt.Insets(30, 40, 27, 0);
         jPanel1.add(jRadioButton1, gridBagConstraints);
 
-        jRadioButton2.setText("Date:");
+        jRadioButton2.setText("URL 1:");
         buttonGroup1.add(jRadioButton2);
         jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -81,9 +81,9 @@ public class DiffDialog extends CommandDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.ipadx = 43;
-        gridBagConstraints.insets = new java.awt.Insets(31, 40, 0, 0);
+        gridBagConstraints.gridy = 2;
+        gridBagConstraints.ipadx = 36;
+        gridBagConstraints.insets = new java.awt.Insets(30, 40, 0, 0);
         jPanel1.add(jRadioButton2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -91,75 +91,72 @@ public class DiffDialog extends CommandDialog {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
-        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 37);
+        gridBagConstraints.insets = new java.awt.Insets(30, 10, 0, 35);
         gridBagConstraints.weightx = 1.0;
         jPanel1.add(jTextField1, gridBagConstraints);
 
+        jTextField2.setEnabled(false);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
-        gridBagConstraints.insets = new java.awt.Insets(31, 10, 4, 37);
+        gridBagConstraints.insets = new java.awt.Insets(30, 10, 4, 35);
         gridBagConstraints.weightx = 1.0;
         jPanel1.add(jTextField2, gridBagConstraints);
-
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 276;
-        gridBagConstraints.insets = new java.awt.Insets(27, 10, 1, 37);
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(jTextField3, gridBagConstraints);
-
-        jLabel1.setText("specify revision number ARG (or X:Y range)");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 13;
-        gridBagConstraints.insets = new java.awt.Insets(1, 10, 38, 37);
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(jLabel1, gridBagConstraints);
-
-        jLabel2.setText("specify a date ARG (instead of a revision)");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.gridheight = 2;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 24;
-        gridBagConstraints.insets = new java.awt.Insets(51, 10, 35, 37);
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(jLabel2, gridBagConstraints);
-
-        jLabel3.setText("passed as bundled options to GNU diff");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
-        gridBagConstraints.ipadx = 37;
-        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 37);
-        gridBagConstraints.weightx = 1.0;
-        jPanel1.add(jLabel3, gridBagConstraints);
-
-        jLabel4.setText("Extensions:");
-        gridBagConstraints = new java.awt.GridBagConstraints();
-        gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 2;
-        gridBagConstraints.ipadx = 9;
-        gridBagConstraints.ipady = 5;
-        gridBagConstraints.insets = new java.awt.Insets(27, 60, 0, 0);
-        jPanel1.add(jLabel4, gridBagConstraints);
 
         jCheckBox1.setText("Non-recursive");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 4;
         gridBagConstraints.ipadx = 6;
-        gridBagConstraints.insets = new java.awt.Insets(15, 20, 22, 0);
+        gridBagConstraints.insets = new java.awt.Insets(20, 20, 0, 0);
         jPanel1.add(jCheckBox1, gridBagConstraints);
+
+        jCheckBox2.setText("Dry-run");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.ipadx = 44;
+        gridBagConstraints.insets = new java.awt.Insets(7, 20, 23, 0);
+        jPanel1.add(jCheckBox2, gridBagConstraints);
+
+        jLabel3.setText("Revision 2:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 12;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.insets = new java.awt.Insets(11, 60, 0, 0);
+        jPanel1.add(jLabel3, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 276;
+        gridBagConstraints.insets = new java.awt.Insets(11, 10, 1, 35);
+        gridBagConstraints.weightx = 1.0;
+        jPanel1.add(jTextField3, gridBagConstraints);
+
+        jLabel4.setText("URL 2:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.ipadx = 41;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.insets = new java.awt.Insets(7, 60, 0, 0);
+        jPanel1.add(jLabel4, gridBagConstraints);
+
+        jTextField4.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 276;
+        gridBagConstraints.insets = new java.awt.Insets(7, 10, 1, 35);
+        gridBagConstraints.weightx = 1.0;
+        jPanel1.add(jTextField4, gridBagConstraints);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
@@ -182,24 +179,21 @@ public class DiffDialog extends CommandDialog {
      */
     protected Command buildCommand(Map args) {
 		if (jRadioButton1.isSelected()) {
-			if (jTextField1.getText().length() == 0) {
-				args.put(Diff.REVISION, "BASE");
-			} else {
-				args.put(Diff.REVISION, jTextField1.getText());
-			}
+			args.put(Merge.SOURCE1, jTextField1.getText());
+			args.put(Merge.SOURCE2, jTextField3.getText());
 		}
 		if (jRadioButton2.isSelected()) {
-			args.put(Diff.REVISION, "{" + jTextField2.getText() + "}");
-		}
-		String extension = jTextField3.getText().trim();
-		if (extension.length() > 0) {
-			args.put(Diff.EXTENSIONS, extension);
+			args.put(Merge.SOURCE1, jTextField2.getText());
+			args.put(Merge.SOURCE2, jTextField4.getText());
 		}
 		if (jCheckBox1.isSelected()) {
-			args.put(Diff.NONRECURSIVE, Boolean.TRUE);
+			args.put(Merge.NONRECURSIVE, Boolean.TRUE);
 		}
-		args.put(Diff.TARGETS, getTargets());
-		return new Diff();
+		if (jCheckBox2.isSelected()) {
+			args.put(Merge.DRY_RUN, Boolean.TRUE);
+		}
+		args.put(Merge.TARGET, getTargets());
+		return new Merge();
     }
 
     /**
@@ -233,20 +227,29 @@ public class DiffDialog extends CommandDialog {
      */
     protected boolean isValidOptions() {
 		if (jRadioButton1.isSelected()) {
-			String revision = jTextField1.getText().trim();
-			if (revision.length() == 0) {
-				jTextField1.setText(revision);
+			String revision1 = jTextField1.getText().trim();
+			if (revision1.length() == 0) {
+				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for Revision 1");
+				return false;
 			}
-		}
-		if (jRadioButton2.isSelected()) {
-			String date = jTextField2.getText().trim();
-			// XXX validate date is in YYYY-MM-DD format using regex
-			if (date.length() == 0) {
-				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a date");
+			String revision2 = jTextField3.getText().trim();
+			if (revision2.length() == 0) {
+				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for Revision 2");
 				return false;
 			}
 		}
-		jTextField3.setText(jTextField3.getText().trim());
+		if (jRadioButton2.isSelected()) {
+			String url1 = jTextField2.getText().trim();
+			if (url1.length() == 0) {
+				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for URL 1");
+				return false;
+			}
+			String url2 = jTextField4.getText().trim();
+			if (url2.length() == 0) {
+				JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a value for URL 2");
+				return false;
+			}
+		}
 		return true;
     }
 
@@ -254,12 +257,16 @@ public class DiffDialog extends CommandDialog {
 	 * Invoked when an action occurs.
 	 */
 	public void actionPerformed(ActionEvent e) {
-		if ("Revision".equals(e.getActionCommand())) {
-			jTextField2.setEnabled(false);
+		if ("Revision 1".equals(e.getActionCommand())) {
 			jTextField1.setEnabled(true);
-		} else if ("Date".equals(e.getActionCommand())) {
-			jTextField2.setEnabled(true);
+			jTextField3.setEnabled(true);
+			jTextField2.setEnabled(false);
+			jTextField4.setEnabled(false);
+		} else if ("URL 1".equals(e.getActionCommand())) {
 			jTextField1.setEnabled(false);
+			jTextField3.setEnabled(false);
+			jTextField2.setEnabled(true);
+			jTextField4.setEnabled(true);
 		}
 
 	}
@@ -267,16 +274,16 @@ public class DiffDialog extends CommandDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel4;
     private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField jTextField3;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JTextField jTextField4;
     // End of variables declaration//GEN-END:variables
 
 }

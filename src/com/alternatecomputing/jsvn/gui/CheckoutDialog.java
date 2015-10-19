@@ -3,6 +3,7 @@ package com.alternatecomputing.jsvn.gui;
 import com.alternatecomputing.jsvn.command.Checkout;
 import com.alternatecomputing.jsvn.command.Command;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
+import com.alternatecomputing.jsvn.configuration.Configuration;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class CheckoutDialog extends CommandDialog {
 	private static final String DIALOG_TITLE = "Checkout";
 	private static final String DIALOG_CAPTION = "Checkout Options";
+	private Configuration _newConfig;
 
 	/**
      * constructor
@@ -36,6 +38,7 @@ public class CheckoutDialog extends CommandDialog {
     private void initComponents() {//GEN-BEGIN:initComponents
         java.awt.GridBagConstraints gridBagConstraints;
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         jPanel1 = new javax.swing.JPanel();
         jTextField1 = new javax.swing.JTextField();
         jCheckBox1 = new javax.swing.JCheckBox();
@@ -43,8 +46,18 @@ public class CheckoutDialog extends CommandDialog {
         jLabel2 = new javax.swing.JLabel();
         jTextField2 = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
-        jLabel3 = new javax.swing.JLabel();
         jTextField3 = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
+        jTextField4 = new javax.swing.JTextField();
+        jPasswordField1 = new javax.swing.JPasswordField();
+        jPasswordField2 = new javax.swing.JPasswordField();
+        jTextField5 = new javax.swing.JTextField();
+        jRadioButton1 = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
 
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
@@ -54,49 +67,53 @@ public class CheckoutDialog extends CommandDialog {
 
         jPanel1.setLayout(new java.awt.GridBagLayout());
 
-        jPanel1.setPreferredSize(new java.awt.Dimension(550, 220));
+        jPanel1.setPreferredSize(new java.awt.Dimension(550, 350));
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
+        gridBagConstraints.ipady = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 82);
         jPanel1.add(jTextField1, gridBagConstraints);
 
         jCheckBox1.setText("Non-recursive");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 3;
-        gridBagConstraints.insets = new java.awt.Insets(20, 26, 16, 0);
+        gridBagConstraints.gridy = 9;
+        gridBagConstraints.ipadx = 6;
+        gridBagConstraints.insets = new java.awt.Insets(5, 20, 28, 0);
         jPanel1.add(jCheckBox1, gridBagConstraints);
 
         jLabel1.setText("URL:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
-        gridBagConstraints.gridheight = 2;
         gridBagConstraints.ipadx = 53;
         gridBagConstraints.ipady = 5;
-        gridBagConstraints.insets = new java.awt.Insets(20, 60, 50, 0);
+        gridBagConstraints.insets = new java.awt.Insets(20, 60, 0, 0);
         jPanel1.add(jLabel1, gridBagConstraints);
 
         jLabel2.setText("Local Path:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.ipadx = 14;
         gridBagConstraints.ipady = 5;
-        gridBagConstraints.insets = new java.awt.Insets(31, 60, 0, 0);
+        gridBagConstraints.insets = new java.awt.Insets(20, 60, 0, 0);
         jPanel1.add(jLabel2, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 4;
+        gridBagConstraints.gridwidth = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
+        gridBagConstraints.ipady = 1;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(31, 10, 1, 0);
+        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 82);
         jPanel1.add(jTextField2, gridBagConstraints);
 
         jButton1.setText("...");
@@ -108,41 +125,166 @@ public class CheckoutDialog extends CommandDialog {
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 2;
-        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridy = 4;
         gridBagConstraints.ipadx = -3;
         gridBagConstraints.ipady = -5;
-        gridBagConstraints.insets = new java.awt.Insets(31, 10, 0, 32);
+        gridBagConstraints.insets = new java.awt.Insets(20, 150, 0, 32);
         jPanel1.add(jButton1, gridBagConstraints);
 
-        jLabel3.setText("Revision:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 276;
+        gridBagConstraints.ipady = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 82);
+        jPanel1.add(jTextField3, gridBagConstraints);
+
+        jLabel4.setText("Username:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.ipadx = 15;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.insets = new java.awt.Insets(20, 60, 0, 0);
+        jPanel1.add(jLabel4, gridBagConstraints);
+
+        jLabel5.setText("Password:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 2;
-        gridBagConstraints.ipadx = 24;
+        gridBagConstraints.ipadx = 17;
         gridBagConstraints.ipady = 5;
-        gridBagConstraints.insets = new java.awt.Insets(30, 60, 0, 0);
-        jPanel1.add(jLabel3, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(20, 60, 0, 0);
+        jPanel1.add(jLabel5, gridBagConstraints);
+
+        jLabel6.setText("Confirm:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.ipadx = 26;
+        gridBagConstraints.ipady = 5;
+        gridBagConstraints.insets = new java.awt.Insets(20, 60, 0, 0);
+        jPanel1.add(jLabel6, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 136;
+        gridBagConstraints.ipady = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 0);
+        jPanel1.add(jTextField4, gridBagConstraints);
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 2;
         gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 136;
+        gridBagConstraints.ipady = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 0);
+        jPanel1.add(jPasswordField1, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 3;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 136;
+        gridBagConstraints.ipady = 1;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(20, 10, 0, 0);
+        jPanel1.add(jPasswordField2, gridBagConstraints);
+
+        jTextField5.setEnabled(false);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.ipadx = 276;
         gridBagConstraints.weightx = 1.0;
-        gridBagConstraints.insets = new java.awt.Insets(30, 10, 1, 0);
-        jPanel1.add(jTextField3, gridBagConstraints);
+        gridBagConstraints.insets = new java.awt.Insets(5, 10, 1, 82);
+        jPanel1.add(jTextField5, gridBagConstraints);
+
+        jRadioButton1.setSelected(true);
+        jRadioButton1.setText("Revision:");
+        buttonGroup1.add(jRadioButton1);
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionHandler(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.ipadx = 19;
+        gridBagConstraints.ipady = -3;
+        gridBagConstraints.insets = new java.awt.Insets(20, 40, 0, 0);
+        jPanel1.add(jRadioButton1, gridBagConstraints);
+
+        jRadioButton2.setText("Date:");
+        buttonGroup1.add(jRadioButton2);
+        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                actionHandler(evt);
+            }
+        });
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 7;
+        gridBagConstraints.ipadx = 43;
+        gridBagConstraints.ipady = -3;
+        gridBagConstraints.insets = new java.awt.Insets(5, 40, 0, 0);
+        jPanel1.add(jRadioButton2, gridBagConstraints);
+
+        jLabel3.setText("specify revision number ARG (or X:Y range)");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 6;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 13;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 82);
+        jPanel1.add(jLabel3, gridBagConstraints);
+
+        jLabel7.setText("specify a date ARG (instead of a revision)");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 8;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.ipadx = 24;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 10, 0, 82);
+        jPanel1.add(jLabel7, gridBagConstraints);
 
         getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
     }//GEN-END:initComponents
 
+    private void actionHandler(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actionHandler
+		actionPerformed(evt);
+    }//GEN-LAST:event_actionHandler
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // Add your handling code here:
 		JFileChooser chooser;
-		File currentWorkingDirectory = new File(ConfigurationManager.getInstance().getWorkingDirectory());
-		if (currentWorkingDirectory.exists()) {
-			chooser = new JFileChooser(currentWorkingDirectory);
+		String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+		if (workingDirectory != null) {
+			File currentWorkingDirectory = new File(workingDirectory);
+			if (currentWorkingDirectory.exists()) {
+				chooser = new JFileChooser(currentWorkingDirectory);
+			} else {
+				chooser = new JFileChooser();
+			}
 		} else {
 			chooser = new JFileChooser();
 		}
@@ -167,11 +309,17 @@ public class CheckoutDialog extends CommandDialog {
     protected Command buildCommand(Map args) {
 		args.put(Checkout.REPOS_URL, jTextField1.getText().trim());
 		args.put(Checkout.DESTINATION, jTextField2.getText().trim());
-		String revision = jTextField3.getText().trim();
-		if ("".equals(revision)) {
-			args.put(Checkout.REVISION, "HEAD");
-		} else {
-			args.put(Checkout.REVISION, revision);
+		if (jRadioButton1.isSelected()) {
+			String revision = jTextField3.getText().trim();
+			if ("".equals(revision)) {
+				args.put(Checkout.REVISION, "HEAD");
+			} else {
+				args.put(Checkout.REVISION, revision);
+			}
+		}
+		if (jRadioButton2.isSelected()) {
+			String date = jTextField5.getText().trim();
+			args.put(Checkout.REVISION, date);
 		}
 		if (jCheckBox1.isSelected()) {
 			args.put(Checkout.NONRECURSIVE, Boolean.TRUE);
@@ -214,6 +362,10 @@ public class CheckoutDialog extends CommandDialog {
 			JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a URL");
 			return false;
 		}
+		if (jRadioButton2.isSelected() && jTextField5.getText().trim().length() < 1) {
+			JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a date");
+			return false;
+		}
 		String localPath =jTextField2.getText().trim();
 		if (localPath.length() == 0) {
 			JOptionPane.showMessageDialog(this.getContentPane(), "Must specify a local path");
@@ -223,13 +375,45 @@ public class CheckoutDialog extends CommandDialog {
 			JOptionPane.showMessageDialog(this.getContentPane(), "Local path does not exist");
 			return false;
 		}
+		if (!new String(jPasswordField1.getPassword()).equals(new String(jPasswordField2.getPassword()))) {
+			JOptionPane.showMessageDialog(this.getContentPane(), "Password & confirmation do not match");
+			return false;
+		}
+		// passes validation, update the configuration so the checkout will have the correct auth credentials
+		_newConfig = new Configuration();
+		_newConfig.setUsername(jTextField4.getText().trim());
+		_newConfig.setPassword(new String(jPasswordField1.getPassword()));
+		_newConfig.setWorkingCopy(localPath);
+		ConfigurationManager.getInstance().setConfig(_newConfig);
+
 		return true;
     }
 
 	/**
+	 *
+	 * @param success
+	 */
+	protected void postExecute(boolean success) {
+		if (success) {
+			// if checkout command ran correctly, save the new config settings
+			ConfigurationManager.getInstance().saveConfig();
+		} else {
+			// checkout command errored out, restore the original config settings
+			ConfigurationManager.getInstance().loadConfig();
+		}
+	}
+	/**
 	 * Invoked when an action occurs.
 	 */
 	public void actionPerformed(ActionEvent e) {
+		if (jRadioButton1.isSelected()) {
+			jTextField3.setEnabled(true);
+			jTextField5.setEnabled(false);
+		}
+		if (jRadioButton2.isSelected()) {
+			jTextField3.setEnabled(false);
+			jTextField5.setEnabled(true);
+		}
 	}
 
 	/**
@@ -241,15 +425,26 @@ public class CheckoutDialog extends CommandDialog {
 	}
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPasswordField jPasswordField1;
+    private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JButton jButton1;
+    private javax.swing.JTextField jTextField5;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JRadioButton jRadioButton2;
+    private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JPasswordField jPasswordField2;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JCheckBox jCheckBox1;
+    private javax.swing.JTextField jTextField4;
+    private javax.swing.JLabel jLabel5;
     // End of variables declaration//GEN-END:variables
 
 }

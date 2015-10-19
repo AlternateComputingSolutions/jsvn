@@ -106,7 +106,6 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 						PreferencesDialog d = new PreferencesDialog(new JFrame(), true, c);
 						d.setVisible(true);
 
-						ConfigurationManager.getInstance().saveConfig();
 						SVNTreeModel svnTreeModel = new SVNTreeModel(ConfigurationManager.getInstance().getWorkingCopy(), false);
 						_svnTree.setModel(new DefaultTreeModel(JSVNTree.buildTreeNode(svnTreeModel)));
 					}
@@ -205,7 +204,10 @@ public class Frame extends CenterableFrame implements ActionListener, Executable
 				new MouseAdapter() {
 					private void popup(MouseEvent e) {
 						if (e.isPopupTrigger()) {
-							popupMenu.show((JComponent) e.getSource(), e.getX(), e.getY());
+							// only show popup if at least one tab exists
+							if (_outputTabbedPane.getSelectedIndex() > -1) {
+								popupMenu.show((JComponent) e.getSource(), e.getX(), e.getY());
+							}
 						}
 					}
 

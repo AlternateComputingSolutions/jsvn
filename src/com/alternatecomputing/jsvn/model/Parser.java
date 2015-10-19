@@ -81,22 +81,32 @@ public class Parser {
 
 					// parse working revision
 					String token = st.nextToken();
+					boolean existsInWorkingCopy;
 					if (token.equals("-")) {
 						nodeData.setRevision(SVNTreeNodeData.NOT_VERSIONED);
+						existsInWorkingCopy = true;
 					} else {
-						nodeData.setRevision(Integer.parseInt(token));
+						try {
+							nodeData.setRevision(Integer.parseInt(token));
+							existsInWorkingCopy = true;
+						} catch (NumberFormatException e) {
+							nodeData.setRevision(SVNTreeNodeData.UNKNOWN_VERSION);
+							existsInWorkingCopy = false;
+						}
 					}
 
-					// parse last change revision
-					token = st.nextToken();
-					if (token.equals("?")) {
-						nodeData.setLastChangedRevision(SVNTreeNodeData.NOT_VERSIONED);
-					} else {
-						nodeData.setLastChangedRevision(Integer.parseInt(token));
-					}
+					if (existsInWorkingCopy) {
+						// parse last change revision
+						token = st.nextToken();
+						if (token.equals("?")) {
+							nodeData.setLastChangedRevision(SVNTreeNodeData.NOT_VERSIONED);
+						} else {
+							nodeData.setLastChangedRevision(Integer.parseInt(token));
+						}
 
-					// parse last change author
-					nodeData.setLastChangedAuthor(st.nextToken());
+						// parse last change author
+						nodeData.setLastChangedAuthor(st.nextToken());
+					}
 				}
 				// determine if it's a file or directory
 				File file = new File(ConfigurationManager.getInstance().getWorkingDirectory() + resource);

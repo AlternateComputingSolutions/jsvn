@@ -15,14 +15,15 @@ public class SVNTreeModel {
 	private SVNTreeNodeData _root;
 
 	/**
-	 * builds a complete model of the svn working copy by executing an "svn status -v" command and parsing it's output
+	 * Builds a complete model of the svn working copy by executing an "svn status -v" command and parsing it's output.
+	 * If workingCopy is null or doesn't exist, then a SVNTreemodel is returned with a root with value null.
 	 * @param workingCopy
 	 * @param online
 	 */
 	public SVNTreeModel(String workingCopy, boolean online) {
 		// if working copy is null (not set), return an empty node
-		if ((workingCopy == null) || !(new File(workingCopy).exists())) {
-			_root =  new SVNTreeNodeData();
+		if (workingCopy == null) {
+			_root =  null;
 		} else {
 			// build the status command to run
 			Status status = new Status();
@@ -40,10 +41,10 @@ public class SVNTreeModel {
 				_root =  Parser.parse(result);
 			} catch (CommandException e) {
 				e.printStackTrace();
-				_root =  new SVNTreeNodeData();
+				_root =  null;
 			} catch (IOException e) {
 				e.printStackTrace();
-				_root =  new SVNTreeNodeData();
+				_root =  null;
 			}
 		}
 	}

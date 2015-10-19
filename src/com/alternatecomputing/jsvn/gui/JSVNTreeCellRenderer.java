@@ -84,6 +84,20 @@ public class JSVNTreeCellRenderer extends DefaultTreeCellRenderer {
 		} else if (data.getFileStatus() == SVNTreeNodeData.FILE_STATUS_NOT_VERSIONED) {
 			setForeground(Color.gray);
 		}
+
+		StringBuffer tipText = new StringBuffer("<html>Path: ").append(data.getPath()).append("<br>Name: ").append(data.getName());
+		if (data.getRevision() != SVNTreeNodeData.NOT_VERSIONED && data.getRevision() != SVNTreeNodeData.UNKNOWN_VERSION) {
+			tipText.append("<br>Revision: ").append(data.getRevision());
+		}
+		tipText.append("<br>Node kind: ").append(data.getNodeKind() == SVNTreeNodeData.NODE_KIND_DIRECTORY ? "directory" : "file");
+		if (data.getLastChangedAuthor() != null) {
+			tipText.append("<br>Last Changed Author: ").append(data.getLastChangedAuthor());
+		}
+		if (data.getLastChangedRevision() != SVNTreeNodeData.NOT_VERSIONED && data.getLastChangedRevision() != SVNTreeNodeData.UNKNOWN_VERSION) {
+			tipText.append("<br>Last Changed Rev: ").append(data.getLastChangedRevision()).append("</html>");
+		}
+		setToolTipText(tipText.toString());
+
 		return this;
 	}
 }

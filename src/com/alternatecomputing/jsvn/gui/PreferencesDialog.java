@@ -190,9 +190,14 @@ public class PreferencesDialog extends CenterableDialog {
 
 		// Add your handling code here:
 		JFileChooser chooser;
-		File currentWorkingDirectory = new File(ConfigurationManager.getInstance().getWorkingDirectory());
-		if (currentWorkingDirectory.exists()) {
-			chooser = new JFileChooser(currentWorkingDirectory);
+		String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+		if (workingDirectory != null) {
+			File currentWorkingDirectory = new File(workingDirectory);
+			if (currentWorkingDirectory.exists()) {
+				chooser = new JFileChooser(currentWorkingDirectory);
+			} else {
+				chooser = new JFileChooser();
+			}
 		} else {
 			chooser = new JFileChooser();
 		}

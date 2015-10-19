@@ -32,6 +32,7 @@ public class ConfigurationManager {
 				if (_instance == null) {
 					_instance = new ConfigurationManager();
 					_instance._config = new Configuration();
+					_instance.loadConfig();
 				}
 			}
 		}
