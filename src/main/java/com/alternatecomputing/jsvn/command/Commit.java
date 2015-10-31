@@ -27,7 +27,7 @@ import java.util.Map;
  *   --encoding arg           : treat value as being in charset encoding ARG
  */
 public class Commit extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn commit --file {0} {1} " + Command.NON_INTERACTIVE_MODIFIER;
+	private static final String COMMAND = "{0} commit --file {1} {2} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String COMMIT_MESSAGE = "COMMIT_MESSAGE";
 	public static final String TARGETS = "TARGETS";
 
@@ -57,7 +57,7 @@ public class Commit extends Command implements WorkingCopyModifiable {
 			out.close();
 
 			// build the command
-			setCommand(MessageFormat.format(COMMAND, new String[]{tempFile.getCanonicalPath(), targets}));
+			setCommand(MessageFormat.format(COMMAND, getExecutablePath(), tempFile.getCanonicalPath(), targets));
 		} catch (IOException e) {
 			throw new CommandException("Error while building commit command.  Original exception: " + e.getMessage());
 		}

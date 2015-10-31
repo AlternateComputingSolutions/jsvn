@@ -75,7 +75,7 @@ import java.util.Map;
  *	  --no-ignore              : disregard default and svn:ignore property ignores
  */
 public class Status extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn status {0} {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;
+	private static final String COMMAND = "{0} status {1} {2} {3} {4} {5} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String SHOW_UPDATES = "SHOW_UPDATES";
 	public static final String TARGETS = "TARGETS";
 	public static final String VERBOSE = "VERBOSE";
@@ -123,7 +123,8 @@ public class Status extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{showUpdatesOption, verboseOption, nonRecursiveOption, quietOption, targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), showUpdatesOption, verboseOption,
+				nonRecursiveOption, quietOption, targets));
 	}
 
 }

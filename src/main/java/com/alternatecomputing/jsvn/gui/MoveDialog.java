@@ -239,7 +239,7 @@ public class MoveDialog extends CommandDialog {
 			// use the location in the text field
 			chooser = new JFileChooser(currentWorkingDirectory);
 		} else {
-			String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+			String workingDirectory = ConfigurationManager.getInstance().getConfig().getWorkingDirectory();
 			if (workingDirectory != null) {
 				currentWorkingDirectory = new File(workingDirectory);
 				if (currentWorkingDirectory.exists()) {

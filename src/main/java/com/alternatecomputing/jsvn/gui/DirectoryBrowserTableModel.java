@@ -58,7 +58,7 @@ public class DirectoryBrowserTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		SVNTreeNodeData nodeData;
 		nodeData = (SVNTreeNodeData) _contents.get( rowIndex );
-		File file = new File(ConfigurationManager.getInstance().getWorkingDirectory() + Constants.SVN_PATH_SEPARATOR + nodeData.getPath());
+		File file = new File(ConfigurationManager.getInstance().getConfig().getWorkingDirectory() + Constants.SVN_PATH_SEPARATOR + nodeData.getPath());
 
 		switch ( columnIndex ) {
 			case 0:

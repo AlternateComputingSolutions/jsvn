@@ -37,7 +37,7 @@ import java.text.MessageFormat;
  *   --non-interactive        : do no interactive prompting
  */
 public class Merge extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn merge {0} {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;   // non-recursive, dry-run, source1, source2, target
+	private static final String COMMAND = "{0} merge {1} {2} {3} {4} {5} " + Command.NON_INTERACTIVE_MODIFIER;   // non-recursive, dry-run, source1, source2, target
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String DRY_RUN = "DRY_RUN";
 	public static final String SOURCE1 = "SOURCE1";
@@ -79,6 +79,6 @@ public class Merge extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{nonRecursiveOption, dryRunOption, source1, source2, target}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), nonRecursiveOption, dryRunOption, source1, source2, target));
 	}
 }

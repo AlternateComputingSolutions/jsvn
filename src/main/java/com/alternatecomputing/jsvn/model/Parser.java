@@ -39,7 +39,7 @@ public class Parser {
 		File localItem;
 		SVNTreeNodeData root = null;
 		SVNTreeNodeData parent;
-		String wkdirpath = new File(ConfigurationManager.getInstance().getWorkingDirectory()).getCanonicalPath();
+		String wkdirpath = new File(ConfigurationManager.getInstance().getConfig().getWorkingDirectory()).getCanonicalPath();
         String[] sortedEntries = sortByFileName(result);
 		// loop through the command output
 		for (int i = 0; i < sortedEntries.length; i++) {

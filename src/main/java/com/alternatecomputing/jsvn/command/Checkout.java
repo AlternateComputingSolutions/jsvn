@@ -26,7 +26,7 @@ import java.util.Map;
  *   --non-interactive        : do no interactive prompting
  */
 public class Checkout extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn checkout {0} {1} {2} {3} {4} {5} " + Command.NON_INTERACTIVE_MODIFIER;
+	private static final String COMMAND = "{0} checkout {1} {2} {3} {4} {5} {6} " + Command.NON_INTERACTIVE_MODIFIER;
 	public static final String DESTINATION = "DESTINATION";
 	public static final String REVISION = "REVISION";
 	public static final String REPOS_URL = "REPOS_URL";
@@ -79,6 +79,7 @@ public class Checkout extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{revision, url, destination, nonRecursiveOption, username, password}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), revision, url, destination
+				, nonRecursiveOption, username, password));
 	}
 }

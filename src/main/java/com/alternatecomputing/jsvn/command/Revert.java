@@ -16,7 +16,7 @@ import java.util.Map;
  *    -q [--quiet]             : print as little as possible
  */
 public class Revert extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn revert {0}";
+	private static final String COMMAND = "{0} revert {1}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
@@ -28,6 +28,6 @@ public class Revert extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), targets));
 	}
 }

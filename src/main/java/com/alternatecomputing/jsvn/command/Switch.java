@@ -24,7 +24,7 @@ import java.text.MessageFormat;
  *   --non-interactive        : do no interactive prompting
  */
 public class Switch extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn switch {0} {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, non-recursive, url, path
+	private static final String COMMAND = "{0} switch {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, non-recursive, url, path
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String REVISION = "REVISION";
 	public static final String URL = "URL";
@@ -59,6 +59,6 @@ public class Switch extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{revision, nonRecursiveOption, url, path}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), revision, nonRecursiveOption, url, path));
 	}
 }

@@ -18,7 +18,7 @@ import java.util.Map;
  *   --password arg           : specify a password ARG
  */
 public class Cat extends Command {
-	private static final String COMMAND = "svn cat {0} {1}";   // revision, targets
+	private static final String COMMAND = "{0} cat {1} {2}";   // revision, targets
 	public static final String REVISION = "REVISION";
 	public static final String TARGETS = "TARGETS";
 
@@ -38,6 +38,6 @@ public class Cat extends Command {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{revision, targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), revision, targets));
 	}
 }

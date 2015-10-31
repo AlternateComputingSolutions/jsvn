@@ -27,7 +27,7 @@ import java.util.Map;
  *	  --message-encoding arg   : take log message in charset encoding ARG
  */
 public class Delete extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn delete {0}";
+	private static final String COMMAND = "{0} delete {1}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
@@ -39,6 +39,6 @@ public class Delete extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), targets));
 	}
 }

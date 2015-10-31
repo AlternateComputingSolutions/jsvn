@@ -1,6 +1,7 @@
 package com.alternatecomputing.jsvn.command;
 
 import com.alternatecomputing.jsvn.Constants;
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 
 import java.util.Map;
 
@@ -36,6 +37,14 @@ public class Command implements Commandable {
 		// save the result
 		_result = exec.getOutput();
 
+	}
+
+	/**
+	 * Helper to get the executable from config
+	 * @return
+	 */
+	protected String getExecutablePath() {
+		return ConfigurationManager.getInstance().getConfig().getExecutablePath();
 	}
 
 	/**

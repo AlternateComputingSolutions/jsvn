@@ -2,8 +2,10 @@ package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.command.Checkout;
 import com.alternatecomputing.jsvn.command.Commandable;
-import com.alternatecomputing.jsvn.configuration.Configuration;
+import com.alternatecomputing.jsvn.configuration.ConfigBuilder;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
+import com.alternatecomputing.jsvn.configuration.Configuration;
+import com.alternatecomputing.jsvn.configuration.DefaultConfiguration;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -277,7 +279,7 @@ public class CheckoutDialog extends CommandDialog {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // Add your handling code here:
 		JFileChooser chooser;
-		String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+		String workingDirectory = ConfigurationManager.getInstance().getConfig().getWorkingDirectory();
 		if (workingDirectory != null) {
 			File currentWorkingDirectory = new File(workingDirectory);
 			if (currentWorkingDirectory.exists()) {
@@ -373,8 +375,7 @@ public class CheckoutDialog extends CommandDialog {
 			return false;
 		}
 		// passes validation, update the configuration so the checkout will have the correct auth credentials
-		_newConfig = new Configuration();
-		_newConfig.setWorkingCopy(localPath);
+		_newConfig = new ConfigBuilder().buildConfig(localPath, ConfigurationManager.getInstance().getConfig().getExecutablePath());
 		ConfigurationManager.getInstance().setConfig(_newConfig);
 		return true;
     }
@@ -388,7 +389,7 @@ public class CheckoutDialog extends CommandDialog {
 		if (success) {
 			// if checkout command ran correctly, save the new config settings
 			ConfigurationManager.getInstance().saveConfig();
-			Application.getApplicationFrame().setWorkingCopy(ConfigurationManager.getInstance().getWorkingCopy());
+			Application.getApplicationFrame().setWorkingCopy(ConfigurationManager.getInstance().getConfig().getWorkingCopy());
 		} else {
 			// checkout command errored out, restore the original config settings
 			ConfigurationManager.getInstance().loadConfig();

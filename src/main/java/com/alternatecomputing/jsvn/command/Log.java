@@ -41,7 +41,7 @@ import java.util.Map;
  *   --xml                    : output in xml
  */
 public class Log extends Command {
-	private static final String COMMAND = "svn log {0} {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;    // revision, verbose, quiet, targets
+	private static final String COMMAND = "{0} log {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;    // revision, verbose, quiet, targets
 	public static final String QUIET = "QUIET";
 	public static final String REVISION = "REVISION";
 	public static final String TARGETS = "TARGETS";
@@ -79,6 +79,6 @@ public class Log extends Command {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{revision, verboseOption, quietOption, targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), revision, verboseOption, quietOption, targets));
 	}
 }

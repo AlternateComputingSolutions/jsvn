@@ -1,52 +1,18 @@
 package com.alternatecomputing.jsvn.configuration;
 
-import com.alternatecomputing.jsvn.Constants;
-import com.alternatecomputing.jsvn.util.StringUtil;
-
 /**
- * provides handling of configuration properties
+ * Created by alberto on 31/10/15.
  */
-public class Configuration implements Cloneable {
+public interface Configuration {
+	String getWorkingCopy();
 
-	private String _workingCopy;
-	private String _workingDirectory;
+	void setWorkingCopy(String workingCopy);
 
-	/**
-	 * returns the working copy directory
-	 * @return working copy directory
-	 */
-	public String getWorkingCopy() {
-		return _workingCopy;
-	}
+	String getExecutablePath();
 
-	/**
-	 * sets the working copy directory
-	 * @param workingCopy Working directory
-	 */
-	public void setWorkingCopy(String workingCopy) {
-		_workingCopy = StringUtil.normalizeFileEncoding(workingCopy);
-		if (_workingCopy != null) {
-			_workingDirectory = _workingCopy.substring(0, _workingCopy.lastIndexOf(Constants.SVN_PATH_SEPARATOR) + 1);
-		} else {
-			_workingDirectory  = null;
-		}
-	}
+	void setExecutablePath(String executable);
 
-	/**
-	 * get the working directory value from the Configuration object
-	 * @return working directory value or null if not defined
-	 */
-	public String getWorkingDirectory() {
-		return _workingDirectory;
-	}
+	Object clone();
 
-	/**
-	 * return a copy of the object
-	 * @return Copy of the object
-	 */
-	public Object clone() {
-		Configuration c = new Configuration();
-		c.setWorkingCopy(getWorkingCopy());
-		return c;
-	}
+	String getWorkingDirectory();
 }

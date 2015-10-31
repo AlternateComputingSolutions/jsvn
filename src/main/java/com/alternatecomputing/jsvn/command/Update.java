@@ -37,7 +37,7 @@ import java.util.Map;
  *    --non-interactive        : do no interactive prompting
  */
 public class Update extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn update {0} {1} {2} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, non-recursive, targets
+	private static final String COMMAND = "{0} update {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, non-recursive, targets
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String REVISION = "REVISION";
 	public static final String TARGETS = "TARGETS";
@@ -66,6 +66,6 @@ public class Update extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{revision, nonRecursiveOption, targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), revision, nonRecursiveOption, targets));
 	}
 }

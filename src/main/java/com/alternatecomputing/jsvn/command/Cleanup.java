@@ -9,7 +9,7 @@ import java.text.MessageFormat;
  * usage: cleanup [PATH [PATH ... ]]
  */
 public class Cleanup extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn cleanup {0}";
+	private static final String COMMAND = "{0} cleanup {1}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
@@ -21,6 +21,6 @@ public class Cleanup extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), targets));
 	}
 }

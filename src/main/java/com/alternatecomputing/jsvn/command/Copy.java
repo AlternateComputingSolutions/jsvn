@@ -30,7 +30,7 @@ import java.text.MessageFormat;
  *   --encoding arg           : treat value as being in charset encoding ARG
  */
 public class Copy extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn copy {0} {1} {2} " + Command.NON_INTERACTIVE_MODIFIER;	// revision, source, destination
+	private static final String COMMAND = "{0} copy {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;	// revision, source, destination
 	public static final String SOURCE = "SOURCE";
 	public static final String DESTINATION = "DESTINATION";
 	public static final String REVISION = "REVISION";
@@ -56,7 +56,7 @@ public class Copy extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{revision, source, destination}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), revision, source, destination));
 
 	}
 }

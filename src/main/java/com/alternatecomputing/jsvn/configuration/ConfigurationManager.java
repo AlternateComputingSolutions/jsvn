@@ -16,6 +16,8 @@ public class ConfigurationManager {
 
 	private static final String CONFIG_LOCATION = ".jsvn" + File.separator + "config";
 	private static final String JSVN_WORKING_COPY = "jsvn.working_copy";
+	private static final String JSVN_EXECUTABLE = "jsvn.executable";
+	private static final String DEFAULT_SVN_EXECUTABLE = "svn";
 	private static ConfigurationManager _instance;
 	private Configuration _config;
 	private Properties _props = new Properties();
@@ -31,7 +33,6 @@ public class ConfigurationManager {
 			synchronized (ConfigurationManager.class) {
 				if (_instance == null) {
 					_instance = new ConfigurationManager();
-					_instance._config = new Configuration();
 					_instance.loadConfig();
 				}
 			}
@@ -65,8 +66,8 @@ public class ConfigurationManager {
 		try {
 			if (_configFile.exists()) {
 				_props.load(new FileInputStream(_configFile));
-				_config = new Configuration();
-				_config.setWorkingCopy(_props.getProperty(JSVN_WORKING_COPY));
+				_config = new ConfigBuilder().buildConfig(_props.getProperty(JSVN_WORKING_COPY)
+						, _props.getProperty(JSVN_EXECUTABLE));
 			}
 
 		} catch (FileNotFoundException e) {
@@ -85,6 +86,7 @@ public class ConfigurationManager {
 
 			// update the configuration properties
 			_props.setProperty(JSVN_WORKING_COPY, _config.getWorkingCopy());
+			_props.setProperty(JSVN_EXECUTABLE, _config.getExecutablePath());
 
 			// write to file
 			if (createConfigDir()) {
@@ -105,22 +107,6 @@ public class ConfigurationManager {
 	 */
 	public void setConfig(Configuration config) {
 		_config = config;
-	}
-
-	/**
-	 * get the working copy value from the Configuration object
-	 * @return Working copy value
-	 */
-	public String getWorkingCopy() {
-		return _config.getWorkingCopy();
-	}
-
-	/**
-	 * get the working directory value from the Configuration object
-	 * @return working directory value or null if not defined
-	 */
-	public String getWorkingDirectory() {
-		return _config.getWorkingDirectory();
 	}
 
 	/**

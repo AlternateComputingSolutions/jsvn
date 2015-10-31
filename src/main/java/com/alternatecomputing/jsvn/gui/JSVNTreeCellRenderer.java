@@ -73,7 +73,7 @@ public class JSVNTreeCellRenderer extends DefaultTreeCellRenderer {
 		tipText.append("<br>Node kind: ").append(data.getNodeKind() == SVNTreeNodeData.NODE_KIND_DIRECTORY ? "directory" : "file");
 
 		if (data.getNodeKind() == SVNTreeNodeData.NODE_KIND_FILE) {
-			File f = new File(ConfigurationManager.getInstance().getWorkingDirectory()+data.getPath());
+			File f = new File(ConfigurationManager.getInstance().getConfig().getWorkingDirectory()+data.getPath());
 			tipText.append("<br>Size: ").append(f.length()).append(" bytes");
 		}
 		if (data.getLastChangedAuthor() != null) {

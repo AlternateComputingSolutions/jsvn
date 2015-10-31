@@ -14,7 +14,7 @@ public class SVNTreeModel {
 	private SVNTreeNodeData _root;
 
 	/**
-	 * Builds a complete model of the svn working copy by executing an "svn status -v" command and parsing it's output.
+	 * Builds a complete model of the svn working copy by executing an status verbose command and parsing it's output.
 	 * If workingCopy is null or doesn't exist, then a SVNTreemodel is returned with a root with value null.
 	 * @param workingCopy
 	 * @param online

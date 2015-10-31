@@ -6,6 +6,7 @@ import com.alternatecomputing.jsvn.command.Diff;
 import com.alternatecomputing.jsvn.command.WorkingCopyModifiable;
 import com.alternatecomputing.jsvn.configuration.Configuration;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
+import com.alternatecomputing.jsvn.configuration.DefaultConfiguration;
 import com.alternatecomputing.jsvn.model.SVNTreeModel;
 import com.alternatecomputing.jsvn.model.SVNTreeNodeData;
 
@@ -155,7 +156,7 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 
 						Configuration c = ConfigurationManager.getInstance().getConfig();
 						JFileChooser chooser;
-						String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+						String workingDirectory = ConfigurationManager.getInstance().getConfig().getWorkingDirectory();
 						if (workingDirectory != null) {
 							File currentWorkingDirectory = new File(workingDirectory);
 							if (currentWorkingDirectory.exists()) {
@@ -181,7 +182,7 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 							}
 						}
 
-						setWorkingCopy(ConfigurationManager.getInstance().getWorkingCopy());
+						setWorkingCopy(ConfigurationManager.getInstance().getConfig().getWorkingCopy());
 					}
 				});
 
@@ -244,7 +245,7 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 		mainSplitPane.add(rightSplitPane, JSplitPane.RIGHT);
 
 		// install the new tree model
-		SVNTreeModel model = new SVNTreeModel(ConfigurationManager.getInstance().getWorkingCopy(), false);
+		SVNTreeModel model = new SVNTreeModel(ConfigurationManager.getInstance().getConfig().getWorkingCopy(), false);
 		_svnTree = new JSVNTree(model);
 		_svnTree.addTreeSelectionListener(new WorkingCopySelectionListener());
 		JScrollPane svnPane = new JScrollPane();
@@ -416,7 +417,7 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 			}
 		} else if (e.getActionCommand().equals(ACTION_SAVE_TAB)) {
 			JFileChooser chooser;
-			String workingDirectory = ConfigurationManager.getInstance().getWorkingDirectory();
+			String workingDirectory = ConfigurationManager.getInstance().getConfig().getWorkingDirectory();
 			if (workingDirectory != null) {
 				File currentWorkingDirectory = new File(workingDirectory);
 				if (currentWorkingDirectory.exists()) {
@@ -542,9 +543,9 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 
 		switch (node.getLevel()) {
 			case 0:
-				return ConfigurationManager.getInstance().getWorkingCopy();
+				return ConfigurationManager.getInstance().getConfig().getWorkingCopy();
 			case 1:
-				return ConfigurationManager.getInstance().getWorkingCopy() + Constants.SVN_PATH_SEPARATOR + name;
+				return ConfigurationManager.getInstance().getConfig().getWorkingCopy() + Constants.SVN_PATH_SEPARATOR + name;
 			default:
 				return buildFileName((DefaultMutableTreeNode) node.getParent()) + Constants.SVN_PATH_SEPARATOR + name;
 		}
@@ -555,7 +556,7 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 	 * @return
 	 */
 	public String getWorkingCopy() {
-		return ConfigurationManager.getInstance().getWorkingCopy();
+		return ConfigurationManager.getInstance().getConfig().getWorkingCopy();
 	}
 
 

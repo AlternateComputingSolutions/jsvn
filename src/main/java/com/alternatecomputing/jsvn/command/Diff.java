@@ -38,7 +38,7 @@ import java.util.Map;
 
  */
 public class Diff extends Command {
-	private static final String COMMAND = "svn diff {0} {1} {2} {3} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, extensions, non-recursive, targets
+	private static final String COMMAND = "{0} diff {1} {2} {3} {4} " + Command.NON_INTERACTIVE_MODIFIER;   // revision, extensions, non-recursive, targets
 	public static final String EXTENSIONS = "EXTENSIONS";
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String REVISION = "REVISION";
@@ -75,6 +75,6 @@ public class Diff extends Command {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{revision, extensions, nonRecursiveOption, targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), revision, extensions, nonRecursiveOption, targets));
 	}
 }

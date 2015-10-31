@@ -24,7 +24,7 @@ import java.util.Map;
  *	  --message-encoding arg   : take log message in charset encoding ARG
  */
 public class Import extends Command implements WorkingCopyModifiable {
-	private static final String COMMAND = "svn import --message {0} {1} {2} {3}";
+	private static final String COMMAND = "{0} import --message {1} {2} {3} {4}";
 	public static final String COMMIT_MESSAGE = "COMMIT_MESSAGE";
 	public static final String NEW_ENTRY_IN_REPOS = "NEW_ENTRY_IN_REPOS";
 	public static final String PATH = "PATH";
@@ -54,6 +54,6 @@ public class Import extends Command implements WorkingCopyModifiable {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{"'" + commitMessage + "'", url, path, newEntry}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), "'" + commitMessage + "'", url, path, newEntry));
 	}
 }

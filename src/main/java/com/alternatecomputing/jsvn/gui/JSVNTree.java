@@ -470,7 +470,7 @@ public class JSVNTree extends JTree implements ActionListener {
 			TreePath path = paths[i];
 			DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
 			SVNTreeNodeData svnNode = (SVNTreeNodeData) dmtn.getUserObject();
-			String target = ConfigurationManager.getInstance().getWorkingDirectory() + svnNode.getPath();
+			String target = ConfigurationManager.getInstance().getConfig().getWorkingDirectory() + svnNode.getPath();
 
 			// if target contains a space, wrap the target in quotes (eg: c:\Document and Settings\...)
 			if (target.indexOf(SPACE) > -1) {
@@ -498,7 +498,7 @@ public class JSVNTree extends JTree implements ActionListener {
 			TreePath path = paths[i];
 			DefaultMutableTreeNode dmtn = (DefaultMutableTreeNode) path.getLastPathComponent();
 			SVNTreeNodeData svnNode = (SVNTreeNodeData) dmtn.getUserObject();
-			targets[i] = (ConfigurationManager.getInstance().getWorkingDirectory()) + svnNode.getPath();
+			targets[i] = (ConfigurationManager.getInstance().getConfig().getWorkingDirectory()) + svnNode.getPath();
 		}
 		return targets;
 	}
@@ -537,7 +537,7 @@ public class JSVNTree extends JTree implements ActionListener {
 		if (nodeData == null) {
 			return;
 		}
-		final String workingCopy = ConfigurationManager.getInstance().getWorkingDirectory() + nodeData.getPath();
+		final String workingCopy = ConfigurationManager.getInstance().getConfig().getWorkingDirectory() + nodeData.getPath();
 		// since building SVNTreeModel and buildTreeNode can take some time, we'll execute them in a separate thread
 		// so that we can continue updating the UI in realtime.
 		Thread t = new Thread(new Runnable() {

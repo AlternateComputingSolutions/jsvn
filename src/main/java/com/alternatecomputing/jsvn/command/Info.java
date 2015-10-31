@@ -1,5 +1,7 @@
 package com.alternatecomputing.jsvn.command;
 
+import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
+
 import java.text.MessageFormat;
 import java.util.Map;
 
@@ -14,7 +16,7 @@ import java.util.Map;
  *	  -R [--recursive]         : descend recursively
  */
 public class Info extends Command {
-	private static final String COMMAND = "svn info {0}";
+	private static final String COMMAND = "{0} info {1}";
 	public static final String TARGETS = "TARGETS";
 
 	public void init(Map args) throws CommandException {
@@ -26,6 +28,6 @@ public class Info extends Command {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, new String[]{targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), new String[]{targets}));
 	}
 }

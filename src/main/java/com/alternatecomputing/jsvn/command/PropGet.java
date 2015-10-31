@@ -11,7 +11,7 @@ import java.util.Map;
  *	  -R [--recursive]         : descend recursively
  */
 public class PropGet extends Command {
-	private static final String COMMAND = "svn propget {0} {1}";
+	private static final String COMMAND = "{0} propget {1} {2}";
 
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String TARGETS = "TARGETS";
@@ -32,6 +32,6 @@ public class PropGet extends Command {
 			throw new CommandException("Missing target(s)");
 		}
 
-		setCommand(MessageFormat.format(COMMAND, new String[]{targets, nonRecursiveOption}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), targets, nonRecursiveOption));
 	}
 }

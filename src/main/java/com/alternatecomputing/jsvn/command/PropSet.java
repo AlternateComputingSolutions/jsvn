@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class PropSet extends Command implements WorkingCopyModifiable {
 
-	private static final String COMMAND = "svn propset {0} {1} {2} {3} {4}";
+	private static final String COMMAND = "{0} propset {1} {2} {3} {4} {5}";
 
 	public static final String NONRECURSIVE = "NONRECURSIVE";
 	public static final String PROPERTY_NAME = "PROPERTY_NAME";
@@ -82,7 +82,7 @@ public class PropSet extends Command implements WorkingCopyModifiable {
 			 propertyValueOption = "-F " + propertyValueOption;
 		}
 
-		setCommand(MessageFormat.format(COMMAND,
-			new String[]{quietOption, nonRecursiveOption, propertyNameOption, propertyValueOption, targets}));
+		setCommand(MessageFormat.format(COMMAND,getExecutablePath(),
+				quietOption, nonRecursiveOption, propertyNameOption, propertyValueOption, targets));
 	}
 }

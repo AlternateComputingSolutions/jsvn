@@ -9,6 +9,7 @@ import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.text.MessageFormat;
 
 
 /**
@@ -28,7 +29,8 @@ public class Application {
 
 		try {
 			CommandRunner runner = new CommandRunner();
-			runner.runCommand(ConfigurationManager.getInstance().getWorkingCopy(), "svn --version");
+			String versionCommand = MessageFormat.format("{0} --version", getExecutablePath());
+			runner.runCommand(ConfigurationManager.getInstance().getConfig().getWorkingCopy(), versionCommand);
 			SVN_CMD_VERSION = runner.getOutput();
 
 		} catch (CommandException ex) {
@@ -45,6 +47,10 @@ public class Application {
 		frameSize.width = ((frameSize.width > screenSize.width) ? screenSize.width : frameSize.width);
 		_applicationFrame.setLocation((screenSize.width - frameSize.width) / 2, (screenSize.height - frameSize.height) / 2);
 		_applicationFrame.setVisible(true);
+	}
+
+	private String getExecutablePath() {
+		return ConfigurationManager.getInstance().getConfig().getExecutablePath();
 	}
 
 	public static void main(String[] argv) {
