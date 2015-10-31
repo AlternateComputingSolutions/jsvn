@@ -42,6 +42,8 @@ public class Checkout extends Command implements WorkingCopyModifiable {
 			throw new CommandException("Missing url");
 		}
 
+		url = url.replace(" ", "%20");
+
 		String destination = (String) args.get(DESTINATION);
 		if (destination == null || "".equals(destination.trim())) {
 			throw new CommandException("Missing destination");
