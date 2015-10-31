@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SVNSERVER=svnrepo
-SVNREPO=test
+SVNREPO="${1:-test}"
 IMPORT_MESSAGE="create test repo"
 FILE=file1
 FILE_CONTENT="a single file"
@@ -9,10 +9,10 @@ SVN_URL="file://$PWD/$SVNSERVER"
 SVN_URL_REPO="$SVN_URL/$SVNREPO"
 
 svnadmin create "$SVNSERVER"
-mkdir -p import/$SVNREPO/{branches,trunk,tags}
+mkdir -p import/"$SVNREPO"/{branches,trunk,tags}
 svn import import "$SVN_URL" -m "$IMPORT_MESSAGE"
 rm -rf import
-git svn clone --stdlayout "$SVN_URL_REPO" gitclone
+git svn clone --stdlayout --prefix origin/ "$SVN_URL_REPO" gitclone
 cd gitclone
 cat > "$FILE" <<EOF
 $FILE_CONTENT

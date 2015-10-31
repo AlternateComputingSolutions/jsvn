@@ -1,1 +1,1 @@
-rm -rf gitclone svnrepo svncheckout
+rm -rf gitclone svnrepo svncheckout $@
