@@ -36,7 +36,7 @@ public class Application {
 			System.exit(1);
 		}
 
-		new SplashScreen("/com/alternatecomputing/jsvn/gui/resources/jsvn_logo.png", _applicationFrame = new Frame(),5000);
+		new SplashScreen("/com/alternatecomputing/jsvn/gui/jsvn_logo.png", _applicationFrame = new Frame(),5000);
 
 		// center the frame on screen
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
