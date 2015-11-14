@@ -29,7 +29,9 @@ public class Command implements Commandable {
 
 		// run the command
 		CommandRunner exec = new CommandRunner();
-		exec.runCommand(System.getProperty(Constants.USER_HOME), _command);
+        String workingCopy = ConfigurationManager.getInstance().getConfig().getWorkingCopy();
+        //String workingCopy = System.getProperty(Constants.USER_HOME);
+        exec.runCommand(workingCopy, _command);
 		if (exec.getError().length() > 0) {
 			throw new CommandException(exec.getError());
 		}

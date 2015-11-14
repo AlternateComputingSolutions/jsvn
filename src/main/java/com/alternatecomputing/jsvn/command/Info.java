@@ -28,6 +28,6 @@ public class Info extends Command {
 		}
 
 		// build the command
-		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), new String[]{targets}));
+		setCommand(MessageFormat.format(COMMAND, getExecutablePath(), targets));
 	}
 }

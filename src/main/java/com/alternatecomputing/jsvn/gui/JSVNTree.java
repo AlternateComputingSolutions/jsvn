@@ -52,6 +52,7 @@ public class JSVNTree extends JTree implements ActionListener {
 	private static final String ACTION_INFO = "Info";
 	private static final String ACTION_IMPORT = "Import";
 	private static final String ACTION_LOG = "Log";
+	private static final String ACTION_LS = "Ls";
 	private static final String ACTION_MERGE = "Merge";
 	private static final String ACTION_MKDIR = "Mkdir";
 	private static final String ACTION_MOVE = "Move";
@@ -71,7 +72,7 @@ public class JSVNTree extends JTree implements ActionListener {
 	private static final String ACTION_UPDATE = "Update";
 	private JPopupMenu mainPopup;
 	private JMenuItem miAdd, miCat, miCheckout, miCleanup, miCommit, miDelete, miDiff, miImport, miCopy, miResolve, miMerge,
-	miMkDir, miMove, miRevert, miSwitch, miUpdate, miInfo, miLog, miStatus, miPropList, miPropGet, miPropSet,
+	miMkDir, miMove, miRevert, miSwitch, miUpdate, miInfo, miLog, miLs, miStatus, miPropList, miPropGet, miPropSet,
 	miPropEdit, miPropDel, miRefreshOnline, miRefreshOffline;
 
 	public JSVNTree(SVNTreeModel root) {
@@ -166,6 +167,10 @@ public class JSVNTree extends JTree implements ActionListener {
 		miLog.addActionListener(this);
 		miLog.setActionCommand(ACTION_LOG);
 		mainPopup.add(miLog);
+		miLs = new JMenuItem(ACTION_LS);
+		miLs.addActionListener(this);
+		miLs.setActionCommand(ACTION_LS);
+		mainPopup.add(miLs);
 		miStatus = new JMenuItem(ACTION_STATUS);
 		miStatus.addActionListener(this);
 		miStatus.setActionCommand(ACTION_STATUS);
@@ -360,6 +365,10 @@ public class JSVNTree extends JTree implements ActionListener {
 			} else if (ae.getActionCommand().equals(ACTION_LOG)) {
 				// process log request
 				CommandDialog dialog = new LogDialog(Application.getApplicationFrame(), true);
+				initializeAndShowDialog(dialog, targets);
+			} else if (ae.getActionCommand().equals(ACTION_LS)) {
+				// process log request
+				CommandDialog dialog = new LsDialog(Application.getApplicationFrame(), true);
 				initializeAndShowDialog(dialog, targets);
 			} else if (ae.getActionCommand().equals(ACTION_MERGE)) {
 				// process merge request

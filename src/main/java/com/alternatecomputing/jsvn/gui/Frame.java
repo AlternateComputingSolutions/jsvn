@@ -1,9 +1,7 @@
 package com.alternatecomputing.jsvn.gui;
 
 import com.alternatecomputing.jsvn.Constants;
-import com.alternatecomputing.jsvn.command.Commandable;
-import com.alternatecomputing.jsvn.command.Diff;
-import com.alternatecomputing.jsvn.command.WorkingCopyModifiable;
+import com.alternatecomputing.jsvn.command.*;
 import com.alternatecomputing.jsvn.configuration.Configuration;
 import com.alternatecomputing.jsvn.configuration.ConfigurationManager;
 import com.alternatecomputing.jsvn.configuration.DefaultConfiguration;
@@ -52,6 +50,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 
 
@@ -60,9 +59,11 @@ import java.util.StringTokenizer;
  */
 public class Frame extends CenterableFrame implements JSVNEventListener, ActionListener {
 	private static final char MNEMONIC_CHECKOUT = 'C';
-	private static final char MNEMONIC_SET_WORKING_COPY = 'S';
-	private static final char MNEMONIC_WORKING_COPY = 'W';
-	private static final char MNEMONIC_REFRESH_WORKING_COPY = 'R';
+    private static final char MNEMONIC_WORKING_COPY = 'W';
+    private static final char MNEMONIC_SET_WORKING_COPY = 'S';
+    private static final char MNEMONIC_REFRESH_WORKING_COPY = 'R';
+    private static final char MNEMONIC_REPO = 'R';
+    private static final char MNEMONIC_REPO_BROWSE = 'B';
 	private static final char MNEMONIC_HELP = 'H';
 	private static final char MNEMONIC_ABOUT = 'A';
 	private static final char MNEMONIC_EXIT = 'E';
@@ -79,6 +80,8 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 	private static final String MENU_ITEM_WORKING_COPY_SET = "Set";
 	private static final String MENU_ITEM_WORKING_COPY_CHECKOUT = "Checkout";
 	private static final String MENU_ITEM_WORKING_COPY_REFRESH = "Refresh";
+	private static final String MENU_ITEM_REPO = "Repository";
+	private static final String MENU_ITEM_REPO_BROWSE = "Browse";
 	private static final String MENU_ITEM_HELP = "Help";
 	private static final String MENU_ITEM_ABOUT = "About";
 	private static final String MENU_ITEM_CLOSE = "Close";
@@ -208,24 +211,50 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 					}
 				});
 		menuWorkingCopy.add(workingCopyRefresh);
+        // create About menu item
+        JMenu menuHelp = new JMenu(MENU_ITEM_HELP);
+        menuHelp.setMnemonic(MNEMONIC_HELP);
+        JMenuItem helpAbout = new JMenuItem(MENU_ITEM_ABOUT);
+        helpAbout.setMnemonic(MNEMONIC_ABOUT);
+        helpAbout.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        AboutDialog aboutDialog = new AboutDialog(Frame.this, true);
+                        aboutDialog.setVisible(true);
+                    }
+                });
+        menuHelp.add(helpAbout);
 
-		// create About menu item
-		JMenu menuHelp = new JMenu(MENU_ITEM_HELP);
-		menuHelp.setMnemonic(MNEMONIC_HELP);
-		JMenuItem helpAbout = new JMenuItem(MENU_ITEM_ABOUT);
-		helpAbout.setMnemonic(MNEMONIC_ABOUT);
-		helpAbout.addActionListener(
-				new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						AboutDialog aboutDialog = new AboutDialog(Frame.this, true);
-						aboutDialog.setVisible(true);
-					}
-				});
-		menuHelp.add(helpAbout);
+
+        // create About menu item
+		JMenu menuRepo = new JMenu(MENU_ITEM_REPO);
+		menuHelp.setMnemonic(MNEMONIC_REPO);
+		JMenuItem repoBrowse = new JMenuItem(MENU_ITEM_REPO_BROWSE);
+        repoBrowse.setMnemonic(MNEMONIC_REPO_BROWSE);
+        repoBrowse.addActionListener(
+                new ActionListener() {
+                    public void actionPerformed(ActionEvent e) {
+                        Browse browse = new Browse();
+                        HashMap args = new HashMap();
+                        browse.setUrl("^/");
+                        args.put(Browse.URL, "^/");
+                        args.put(Browse.STYLE, "xml");
+                        JSVNCommandExecutor executor = new JSVNCommandExecutor(browse, args);
+
+                        // add interested listeners
+                        executor.addJSVNEventListener(Application.getApplicationFrame());
+
+                        // invoke the executor in a separate thread
+                        Thread t = new Thread(executor);
+                        t.start();
+                    }
+                });
+        menuRepo.add(repoBrowse);
 
 		menuFile.add(fileExit);
 		menuBar.add(menuFile);
 		menuBar.add(menuWorkingCopy);
+		menuBar.add(menuRepo);
 		menuBar.add(menuHelp);
 
 		// sets menu bar
@@ -496,30 +525,39 @@ public class Frame extends CenterableFrame implements JSVNEventListener, ActionL
 
 		// handle command events
 		if (event instanceof JSVNCommandEvent) {
-			String error = ((JSVNCommandEvent) event).getError();
+			JSVNCommandEvent jsvnCommandEvent = (JSVNCommandEvent) event;
+			String error = jsvnCommandEvent.getError();
 			if (error != null) {
 				JOptionPane.showMessageDialog(Application.getApplicationFrame().getContentPane(), error);
 			} else {
 				// create a new output tab
-				Commandable command = ((JSVNCommandEvent) event).getCommand();
-				String result = ((JSVNCommandEvent) event).getResult();
+				Commandable command = jsvnCommandEvent.getCommand();
 				_historyTextPane.setText(_historyTextPane.getText() + command.getCommand() + Constants.NEWLINE);
-				JTextPane newPane = new JTextPane();
-				Font fixedFont = new Font("Monospaced", Font.PLAIN, 10);
-				newPane.setFont(fixedFont);
-				newPane.setText(result);
-				newPane.setEditable(false);
+				JComponent component;
+				if(command instanceof ComponentCommandable) {
+					ComponentCommandable componentCommandable = (ComponentCommandable) command;
+					component = componentCommandable.getComponent();
+				} else {
+					JTextPane pane = new JTextPane();
+					Font fixedFont = new Font("Monospaced", Font.PLAIN, 10);
+					pane.setFont(fixedFont);
+					String result = jsvnCommandEvent.getResult();
+					pane.setText(result);
+					pane.setEditable(false);
+					component = pane;
+				}
 
 				// only highlight diff output
 				if (command instanceof Diff) {
+					JEditorPane editorPane = (JEditorPane) component;
 					if (command.getArgs().get(Diff.EXTENSIONS) != null) {
-						addHighlightersToTextPane(newPane, '>', '<');
+						addHighlightersToTextPane(editorPane, '>', '<');
 					} else {
-						addHighlightersToTextPane(newPane, '+', '-');
+						addHighlightersToTextPane(editorPane, '+', '-');
 					}
 				}
 
-				JScrollPane scrollPane = new JScrollPane(newPane);
+				JScrollPane scrollPane = new JScrollPane(component);
 				String commandName = command.getClass().getName();
 				_outputTabbedPane.add(commandName.substring(commandName.lastIndexOf(Constants.PERIOD) + 1), scrollPane);
 				_outputTabbedPane.setSelectedIndex(_outputTabbedPane.getTabCount() - 1);
